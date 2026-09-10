@@ -326,6 +326,10 @@ html[lang="zh-Hant"] .bar .amt .l{ font-family:"Noto Sans TC",sans-serif; letter
   color:var(--sideline-navy); font-size:11.5px; display:block; margin-bottom:3px; font-weight:700;
 }
 html[lang="zh-Hant"] .cr b{ font-family:"Noto Sans TC",sans-serif; letter-spacing:0; }
+/* Client view (2026-09-09): the three change-request callouts are notes for
+   Edward's team, not for Suki. Hidden alongside .tbc when the shared view key
+   is 'client' (set by index.html's panel or ?view=client on either page). */
+html[data-view="client"] .cr{ display:none !important; }
 
 /* ============ success screen ============ */
 .done-mark{ width:64px; height:64px; border-radius:50%; background:var(--ok); display:flex; align-items:center; justify-content:center; margin-bottom:18px; }

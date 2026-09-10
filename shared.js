@@ -89,6 +89,25 @@ function initNav(){
    (booking.js's render(), for instance) redraw in the new language. */
 function boot(after){
   _after = after || null;
+  initView();
   initNav();
   setLang(lang());
+}
+
+/* ---------- dev / client view (2026-09-09) ---------- */
+/* index.html's tweaks panel writes the choice to localStorage 'shhk-mock-view'.
+   booking.html has no panel and shipped with data-view="dev" hard-coded, so a
+   client who had switched to Client on the landing page still saw every dev
+   tag and the three "Backend change request" callouts on the booking screens.
+   Both pages now read the same key here; ?view=client|dev on either URL sets
+   it. Client view hides .tbc, .photo-slot, .dev-note and .cr via CSS. */
+function initView(){
+  const KEY = 'shhk-mock-view';
+  let v = null;
+  try{
+    const forced = new URLSearchParams(location.search).get('view');
+    if (forced === 'client' || forced === 'dev'){ localStorage.setItem(KEY, forced); }
+    v = localStorage.getItem(KEY);
+  }catch(e){}
+  document.documentElement.setAttribute('data-view', v === 'client' ? 'client' : 'dev');
 }

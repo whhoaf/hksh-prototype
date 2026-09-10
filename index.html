@@ -796,6 +796,17 @@ function initTweaksPanel(){
   const params = new URLSearchParams(location.search);
   if (params.get('clean') === '1') document.documentElement.classList.add('clean');
 
+  /* Hosted-link switch (2026-09-09): ?view=client or ?view=dev sets the view
+     for this browser and, for client, also hides the tweaks panel, so a single
+     URL (index.html?view=client) can go to Suki and open clean on first visit.
+     The choice persists via localStorage exactly as if the panel had been
+     clicked, so booking.html and later visits keep it. */
+  const forced = params.get('view');
+  if (forced === 'client' || forced === 'dev') {
+    try{ localStorage.setItem(VIEW_KEY, forced); }catch(e){}
+    if (forced === 'client') document.documentElement.classList.add('clean');
+  }
+
   applyView(localStorage.getItem(VIEW_KEY) || 'dev');
 
   document.querySelectorAll('.tweaks-btns[data-tweak="view"] button').forEach(b => {
