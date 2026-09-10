@@ -1,0 +1,661 @@
+/* Sporting Hub Hong Kong — prototype v2
+   Landing page and shared chrome (nav, drawer, footer, buttons, WhatsApp
+   float, tweaks panel). Copied from html/mockup-v2/mockup.css (the approved
+   mockup) per the brief; booking.html does not load this file, it is
+   self-contained in booking.css (v1's own architecture: booking.html only
+   ever loaded _shared.css, never index.html's styles). Tokens only from
+   tokens.css: every radius is one of the seven --r-* custom properties (or
+   50% for circles).
+   One fix applied versus the approved mockup: `.wa-float svg path` used a
+   literal `fill:#fff`, which breaks the site-wide "no #FFF" rule (DESIGN.md
+   Bans, and this brief's Rules section). Changed to `var(--court-cream)`,
+   visually indistinguishable on the WhatsApp-green circle. No other change
+   from the approved mockup.css. */
+
+/* ============ reset & base ============ */
+*,*::before,*::after{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; }
+html,body{ max-width:100%; overflow-x:hidden; }
+body{
+  margin:0; background:var(--court-cream); color:var(--charcoal);
+  font-family:var(--f-body); font-size:var(--fs-body); line-height:1.6;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+}
+img{ max-width:100%; display:block; }
+a{ color:inherit; text-decoration:none; }
+ul{ margin:0; padding:0; list-style:none; }
+button{ font:inherit; color:inherit; background:none; border:0; cursor:pointer; }
+svg{ display:block; }
+p{ margin:0 0 14px; }
+p:last-child{ margin-bottom:0; }
+:focus-visible{ outline:2px solid var(--sideline-navy); outline-offset:2px; }
+.wrap *{ min-width:0; }
+
+/* ============ layout helpers ============ */
+.wrap{ max-width:var(--wrap); margin:0 auto; padding:0 var(--gut); }
+/* eixo pattern: photo grids break out of the 1200px text column and run near
+   full-bleed, inset only by the page gutter. Same edge inset as .wrap, no
+   width cap until a very wide screen. Used for the pillar and space grids only. */
+.bleed{ max-width:1680px; margin:0 auto; padding:0 20px; }
+@media(min-width:760px){ .bleed{ padding:0 32px; } }
+/* Review fix 2026-09-09 (Alfred, point 4): sections carried --section-gap on
+   both top and bottom, so two adjacent sections stacked 112 + 112 = 224px of
+   air on desktop (144px mobile), double what DESIGN.md specifies ("72px
+   mobile / 112px desktop between marketing sections"). Top padding only now,
+   so the gap between any two sections is exactly one --section-gap; the last
+   section keeps a bottom gap before the footer. Hero to first section is
+   unchanged at one gap. */
+.section{ padding:var(--section-gap) 0 0; }
+section.section:last-of-type{ padding-bottom:var(--section-gap); }
+.section-cool{ background:var(--cool-panel); }
+.overflow-x-auto{ overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+.overflow-x-auto::-webkit-scrollbar{ display:none; }
+
+/* ============ typography ============ */
+h1,h2,h3,h4{ margin:0; font-family:var(--f-display); color:var(--deep-navy); }
+
+.eyebrow{
+  display:block; font-family:var(--f-display); font-weight:600;
+  font-size:var(--fs-eyebrow); text-transform:uppercase; letter-spacing:.08em;
+  color:var(--sideline-navy); margin:0 0 10px;
+}
+.eyebrow.on-photo{ color:var(--court-cream); }
+
+.h-hero{
+  font-family:var(--f-display); font-weight:800;
+  /* DESIGN.md global hero step. The home page no longer uses this class for
+     its headline (the headline is the lockup SVG, see .hero-lockup below);
+     kept for secondary-page headers (Our Service, Our Team, Corporate
+     Event, Media, Contact Us) per DESIGN.md Hero: "The Hero type step
+     (84px) is for page headers on secondary pages... where a one or two
+     word title fits easily. The home page has no typeset hero headline." */
+  font-size:var(--fs-hero);
+  line-height:1.0; letter-spacing:-.025em; color:var(--deep-navy); margin:0 0 18px;
+  overflow-wrap:break-word;
+}
+.h-hero.on-photo{ color:var(--court-cream); }
+
+/* ============ hero lockup (home page headline) ============
+   Per DESIGN.md Hero: "The headline is the horizontal lockup, not typeset
+   words." Same inline SVG markup as the nav lockup, coloured via
+   currentColor. Wrapped in an h1 with an aria-label so the page keeps a
+   real h1; the SVG itself carries aria-hidden so the brand name is not
+   announced twice. viewBox is 157.51 x 40.43 (ratio .2567), so at the
+   600px desktop ceiling it renders about 154px tall. */
+.hero-lockup{
+  display:block; color:var(--court-cream); width:min(420px, 86vw); line-height:0; margin:0 0 16px;
+}
+.hero-lockup svg{ width:100%; height:auto; display:block; }
+@media(min-width:760px){ .hero-lockup{ width:min(600px, 82vw); } }
+
+.h-section{
+  font-family:var(--f-display); font-weight:700; font-size:var(--fs-section);
+  line-height:1.05; letter-spacing:-.02em; color:var(--deep-navy); margin:0 0 14px;
+}
+.h-section.on-dark{ color:var(--court-cream); }
+
+.h-tile{
+  font-family:var(--f-display); font-weight:700; font-size:var(--fs-tile);
+  line-height:1.15; color:var(--deep-navy); margin:0 0 4px;
+}
+.h-tile.on-photo{ color:var(--court-cream); }
+/* tighter line-height inside the 42%-tall tile scrim band so three lines
+   (label, one-line description, price) reliably clear the gradient */
+.tile-text .h-tile{ font-size:20px; line-height:1.1; margin-bottom:3px; }
+@media(min-width:760px){ .tile-text .h-tile{ font-size:24px; } }
+
+.lead{ font-family:var(--f-body); font-weight:400; font-size:var(--fs-lead); line-height:1.5; color:var(--charcoal); max-width:var(--text-col); }
+.lead.on-photo{ color:var(--court-cream); }
+
+.body-text{ font-size:var(--fs-body); line-height:1.6; color:var(--charcoal); max-width:var(--text-col); }
+.body-text.on-photo{ color:var(--court-cream); }
+
+.ui-label{ font-family:var(--f-display); font-weight:600; font-size:var(--fs-ui); }
+.meta{ font-family:var(--f-body); font-weight:500; font-size:var(--fs-meta); color:var(--meta-grey); }
+.meta.on-photo{ color:rgba(251,243,228,.82); }
+
+.tile-desc{ font-family:var(--f-body); font-weight:400; font-size:14.5px; color:rgba(251,243,228,.9); margin:0 0 6px; max-width:34ch; }
+.tile-price{ font-family:var(--f-body); font-weight:600; font-size:14px; color:var(--court-cream); }
+
+/* ============ buttons / pills ============ */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  height:52px; padding:0 26px; border-radius:var(--r-pill); border:2px solid transparent;
+  font-family:var(--f-display); font-weight:600; font-size:17px; white-space:nowrap;
+  transition:background var(--dur) var(--ease),color var(--dur) var(--ease),border-color var(--dur) var(--ease);
+}
+@media(min-width:760px){ .btn{ height:56px; padding:0 30px; font-size:18px; } }
+
+.btn-primary{ background:var(--sideline-navy); color:var(--court-cream); }
+.btn-primary:hover{ background:var(--deep-navy); }
+
+.btn-secondary{ background:transparent; border-color:currentColor; color:var(--sideline-navy); }
+.btn-secondary:hover{ background:rgba(30,68,137,.08); }
+
+.btn-on-dark.btn-primary{ background:var(--court-cream); color:var(--sideline-navy); }
+.btn-on-dark.btn-primary:hover{ background:var(--raised-cream); }
+.btn-on-dark.btn-secondary{ border-color:var(--court-cream); color:var(--court-cream); }
+.btn-on-dark.btn-secondary:hover{ background:rgba(251,243,228,.14); }
+
+.btn[disabled],.btn.is-disabled{ opacity:.45; cursor:not-allowed; }
+
+.btn .wa-glyph{ width:18px; height:18px; flex:none; }
+.btn .wa-glyph path{ fill:var(--wa-green); }
+
+.text-link{
+  display:inline-flex; align-items:center; gap:6px; min-height:44px;
+  font-family:var(--f-display); font-weight:600; font-size:var(--fs-ui); color:var(--sideline-navy);
+}
+.text-link .arrow{ width:16px; height:16px; transition:transform var(--dur) var(--ease); }
+.text-link:hover{ text-decoration:underline; text-underline-offset:3px; }
+.text-link:hover .arrow{ transform:translateX(3px); }
+.text-link.on-photo{ color:var(--court-cream); }
+/* .on-dark: same cream text colour as .on-photo but for text sitting on a
+   FLAT dark surface (book band, footer) with no photo/scrim beneath it, so
+   QA check 7 ("every .on-photo sits inside a .scrim") does not flag it. */
+.text-link.on-dark{ color:var(--court-cream); }
+.text-link .out{ width:12px; height:12px; }
+
+/* ============ language toggle ============ */
+/* Component spec calls for 40px; raised to 44px so every segment clears the
+   site-wide 44px tap-target rule tested in QA. Documented as a deviation. */
+.lang-toggle{ display:inline-flex; align-items:center; border:1px solid var(--hairline); border-radius:var(--r-pill); padding:3px; gap:2px; }
+.lang-toggle button{
+  font-family:var(--f-display); font-weight:600; font-size:15px; height:44px; padding:0 14px;
+  border-radius:var(--r-pill); color:var(--deep-navy); display:flex; align-items:center; justify-content:center;
+}
+.lang-toggle button[aria-pressed="true"]{ background:var(--sideline-navy); color:var(--court-cream); }
+.nav-transparent .lang-toggle{ border-color:rgba(251,243,228,.5); }
+.nav-transparent .lang-toggle button{ color:var(--court-cream); }
+.nav-transparent .lang-toggle button[aria-pressed="true"]{ background:var(--court-cream); color:var(--sideline-navy); }
+
+/* ============ dev annotations ============ */
+.tbc{
+  display:inline-flex; align-items:center; font-family:var(--f-body); font-weight:600; font-size:12px;
+  color:var(--meta-grey); background:var(--hairline); border-radius:var(--r-pill); padding:3px 10px; white-space:nowrap;
+}
+/* .photo-slot: the dev-only spec caption overlaid on an image container, per
+   DESIGN.md "Dev annotations". Hidden in client view alongside .tbc. */
+.photo-slot{
+  position:absolute; z-index:3; left:12px; top:12px;
+  font-family:var(--f-body); font-size:11.5px; font-weight:600; line-height:1.3;
+  color:var(--court-cream); background:rgba(17,37,72,.62); border-radius:var(--r-pill); padding:5px 11px; max-width:calc(100% - 24px);
+}
+/* Fix 2026-09-07 (defect 2): inside .arch containers, --r-arch's top
+   corners are full semicircles, so a pill 12px from the top-left gets
+   clipped by .arch's overflow:hidden. Bottom corners are only 24px, so
+   move the pill there instead; scoped to .arch only, non-arch photo-slots
+   are unaffected. */
+.arch .photo-slot{ top:auto; bottom:12px; }
+html[data-view="client"] .tbc,
+html[data-view="client"] .photo-slot{ display:none !important; }
+
+.price-tbc{ color:var(--meta-grey); }
+html[data-view="dev"] .price-tbc{ text-decoration:underline dotted var(--meta-grey); text-underline-offset:3px; }
+.price-tbc.on-photo,.price-tbc.on-dark{ color:var(--court-line-blue); }
+html[data-view="dev"] .price-tbc.on-photo,html[data-view="dev"] .price-tbc.on-dark{ text-decoration-color:var(--court-line-blue); }
+
+.dev-note{
+  background:var(--cool-panel); border:1px solid var(--hairline); border-radius:var(--r-card);
+  padding:12px 16px; font-size:13.5px; color:var(--meta-grey); margin-bottom:20px;
+}
+html[data-view="client"] .dev-note{ display:none !important; }
+
+/* ============ scrim / on-photo ============ */
+.photo-frame{ position:relative; overflow:hidden; background:var(--cool-panel); }
+.photo-frame > img{ width:100%; height:100%; object-fit:cover; display:block; }
+/* Hero scrim: DESIGN.md's full recipe, gradient spans the lower part of
+   the whole frame because hero text is tall (eyebrow+lockup+lead+pills).
+   z-index required: the active .hero-slide carries z-index:1, so the scrim
+   must sit above that or the photo paints over the text (regardless of DOM order).
+   flex-direction:column + justify-content:flex-end: several tiles reuse
+   .scrim itself as the content box (class="tile-text scrim" on one element,
+   see pillar/space/shop tiles) so its own children must STACK vertically and
+   pack to the bottom, not lay out as a flex row (the flex default), or a
+   label/description/price group renders as three items side by side. */
+.scrim{
+  position:absolute; inset:0; z-index:2; display:flex; flex-direction:column;
+  align-items:stretch; justify-content:flex-end;
+  background:var(--scrim-bottom); pointer-events:none;
+}
+.scrim > *{ pointer-events:auto; width:100%; }
+/* Hero-only: confine the scrim to a bottom-anchored band instead of the
+   full inset:0 frame, so it never darkens the whole photo (bans list:
+   "Cream or white text on a photograph without the scrim" is about
+   coverage, not full-frame darkening). Scoped to .hero-a so the shared
+   .scrim rule above (still inset:0) is untouched for every tile that
+   reuses .scrim as its flex/justify-end content wrapper.
+
+   Review fix 2026-09-09 (Alfred, point 1): the lockup was hard to read on
+   the brighter slides. Measured before the fix: the band started at 50% of
+   the hero and the lockup's top edge sat only 43px inside it, where the
+   shared --scrim-bottom gradient (clear until 35%, .66 at the bottom) is
+   still almost transparent: alpha 0 at the lockup's top edge, .15 at its
+   bottom. The hero now carries its own recipe: the band is taller (66%
+   mobile, 62% desktop) so it starts well above the eyebrow, and the ramp is
+   steep early so the eyebrow sits at about .5 and the lockup at .58 to .77
+   (desktop) / .64 to .76 (mobile), measured by qa.py check 14. The photo's
+   upper 40% stays untouched. Tile scrims (.scrim-tile) are not changed. */
+.hero-a .scrim{
+  inset:auto 0 0 0; height:66%;
+  background:linear-gradient(180deg,
+    rgba(17,37,72,0) 0%,
+    rgba(17,37,72,.30) 12%,
+    rgba(17,37,72,.60) 28%,
+    rgba(17,37,72,.76) 55%,
+    rgba(17,37,72,.86) 100%);
+}
+@media(min-width:1000px){ .hero-a .scrim{ height:62%; } }
+/* Tile scrim (pillar / space / shop tiles): eixo pattern, confine the
+   darkening to the caption band only so photos stay bright. Hard cap at 40%
+   of the tile height; text content inside is sized to fit that band. */
+.scrim.scrim-tile{
+  inset:auto 0 0 0; height:42%; z-index:2;
+  background:linear-gradient(180deg, rgba(17,37,72,0) 0%, rgba(17,37,72,.22) 30%, rgba(17,37,72,.8) 100%);
+}
+.scrim-top{ position:absolute; top:0; left:0; right:0; height:45%; z-index:2; background:var(--scrim-top); pointer-events:none; }
+/* No independent `display` here on purpose: this element is either (a)
+   combined with .scrim ("tile-text scrim"), where .scrim's flex-column
+   must win without a same-specificity fight, or (b) alone as a single-child
+   wrapper (recovery panel tile), where the parent's flex layout is enough. */
+.tile-text{ padding:14px; width:100%; }
+@media(min-width:760px){ .tile-text{ padding:20px; } }
+
+.arch{ border-radius:var(--r-arch); overflow:hidden; position:relative; background:var(--cool-panel); }
+
+/* ============ court diagram ============ */
+.court-dia{ color:var(--court-cream); }
+.court-dia svg{ width:100%; height:auto; display:block; }
+
+/* ============ nav ============ */
+.nav{
+  position:fixed; top:0; left:0; right:0; z-index:50; height:64px; display:flex; align-items:center;
+  background:var(--raised-cream); border-bottom:1px solid var(--hairline);
+  transition:background var(--dur) var(--ease),border-color var(--dur) var(--ease);
+}
+@media(min-width:1000px){ .nav{ height:72px; } }
+.nav .wrap{ display:flex; align-items:center; gap:20px; width:100%; }
+.nav-lockup{ width:150px; flex:none; color:var(--sideline-navy); display:flex; align-items:center; min-height:44px; }
+.nav-lockup svg{ width:100%; height:auto; display:block; }
+
+.nav-items{ display:none; gap:24px; align-items:center; }
+@media(min-width:1000px){ .nav-items{ display:flex; } }
+.nav-items a{
+  font-family:var(--f-display); font-weight:600; font-size:17px; color:var(--sideline-navy);
+  display:inline-flex; align-items:center; gap:5px; min-height:44px;
+}
+.nav-items a .out{ width:12px; height:12px; opacity:.75; }
+/* Wraps a nav link that carries a dev-only .tbc pill (Shop, Media) so the
+   link and its tag sit on one baseline without disturbing the other plain
+   nav-items links. Hidden together with the .tbc pill in client view via
+   the existing html[data-view="client"] .tbc rule (see Dev annotations). */
+.nav-item-wrap{ display:inline-flex; align-items:center; gap:6px; }
+.nav-item-wrap .tbc{ font-size:11px; padding:2px 8px; }
+
+.nav-right{ margin-left:auto; display:flex; align-items:center; gap:12px; }
+.nav-burger{ display:flex; width:44px; height:44px; align-items:center; justify-content:center; flex-direction:column; gap:4px; flex:none; }
+@media(min-width:1000px){ .nav-burger{ display:none; } }
+.nav-burger i{ width:20px; height:2px; background:var(--sideline-navy); display:block; font-style:normal; }
+.nav .book-pill{ background:var(--sideline-navy); color:var(--court-cream); height:44px; padding:0 20px; font-size:15px; }
+@media(min-width:760px){ .nav .book-pill{ height:44px; padding:0 22px; } }
+/* Mobile nav per DESIGN.md "Top nav": collapses to lockup, language toggle,
+   hamburger. The Book pill moves to the bottom of the drawer instead of
+   competing for top-bar width; at 390px, lockup + EN/繁 + Book pill + burger
+   together measured wider than the viewport and visibly overlapped. */
+@media(max-width:999px){ .nav .book-pill{ display:none; } }
+
+/* transparent state: home page only, only before scroll past 80px */
+html:not(.nav-scrolled) .page-home .nav{ background:transparent; border-bottom-color:transparent; }
+html:not(.nav-scrolled) .page-home .nav .nav-items a,
+html:not(.nav-scrolled) .page-home .nav-burger i{ color:var(--court-cream); }
+html:not(.nav-scrolled) .page-home .nav-burger i{ background:var(--court-cream); }
+html:not(.nav-scrolled) .page-home .nav .book-pill{ background:var(--court-cream); color:var(--sideline-navy); }
+html:not(.nav-scrolled) .page-home .nav .lang-toggle{ border-color:rgba(251,243,228,.5); }
+html:not(.nav-scrolled) .page-home .nav .lang-toggle button{ color:var(--court-cream); }
+html:not(.nav-scrolled) .page-home .nav .lang-toggle button[aria-pressed="true"]{ background:var(--court-cream); color:var(--sideline-navy); }
+
+/* nav lockup hides while the nav is transparent on the home page, per
+   DESIGN.md Hero: "Nav lockup hides while the nav is transparent on the
+   home page... and fades in when the nav goes solid after 80px of scroll.
+   One lockup on screen at a time." The hero's own headline is already the
+   lockup, so showing the nav's copy too would put two on screen at once.
+   aria-hidden is toggled in JS (initNavScroll) so screen readers do not
+   get the same link announced twice while it sits invisible. On every
+   other page (booking-s2.html has no .page-home) the lockup is unaffected
+   and stays visible from the top, per DESIGN.md: "On every other page the
+   nav is solid from the top and the lockup is always visible." */
+.page-home .nav .nav-lockup{ transition:opacity 200ms var(--ease); }
+html:not(.nav-scrolled) .page-home .nav .nav-lockup{ opacity:0; pointer-events:none; }
+
+/* ============ mobile drawer ============
+   Per DESIGN.md Top nav: "Mobile collapses to lockup, language toggle,
+   hamburger; drawer slides from the right, full height, Deep navy ground
+   with cream text at 22px, Book pill at the bottom of the drawer." Ported
+   from v1 _shared.css .drawer/.scrim, retokenised, renamed .scrim to
+   .drawer-scrim so it cannot collide with the unrelated photo-tile .scrim
+   (position:absolute overlay with pointer-events:none, used throughout the
+   hero/pillar/space/shop tiles) that this design system also defines. */
+.drawer-scrim{
+  position:fixed; inset:0; background:rgba(17,37,72,.55); opacity:0; pointer-events:none;
+  transition:opacity var(--dur) var(--ease); z-index:55;
+}
+.drawer-scrim.is-open{ opacity:1; pointer-events:auto; }
+.drawer{
+  position:fixed; inset:0 0 0 auto; width:min(320px,86vw); background:var(--deep-navy);
+  transform:translateX(100%); transition:transform var(--dur) var(--ease); z-index:60;
+  padding:22px var(--gut); display:flex; flex-direction:column; gap:3px;
+}
+.drawer.is-open{ transform:none; }
+.drawer a{
+  color:var(--court-cream); font-family:var(--f-display); font-weight:700; font-size:22px;
+  padding:13px 0; border-bottom:1px solid var(--hairline-on-navy); display:flex; align-items:center; min-height:44px;
+}
+.drawer-item-wrap{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:13px 0; border-bottom:1px solid var(--hairline-on-navy); }
+.drawer-item-wrap a{ padding:0; border-bottom:0; min-height:auto; }
+.drawer-x{
+  align-self:flex-end; color:var(--court-line-blue); font-size:28px; line-height:1;
+  min-width:44px; min-height:44px; margin-bottom:6px; display:flex; align-items:center; justify-content:center;
+}
+.drawer-book{ margin-top:16px; }
+@media(min-width:1000px){ .drawer,.drawer-scrim{ display:none; } }
+
+/* ============ nav clearance ============ */
+/* nav is fixed; every page body clears it, except the home hero which pulls
+   its full-bleed photo up underneath the transparent nav */
+body{ padding-top:64px; }
+@media(min-width:1000px){ body{ padding-top:72px; } }
+.hero-a{ margin-top:-64px; }
+@media(min-width:1000px){ .hero-a{ margin-top:-72px; } }
+/* booking.html does not load this file; its own sticky (not fixed) header
+   is styled entirely in booking.css, so no .bk-body override is needed here. */
+
+/* ============ hero shared ============ */
+.hero{ position:relative; }
+.hero-slideshow{ position:relative; width:100%; height:100%; overflow:hidden; }
+.hero-slide{ position:absolute; inset:0; opacity:0; overflow:hidden; transition:opacity 650ms var(--ease); }
+.hero-slide.is-active{ opacity:1; z-index:1; }
+/* Step 0 fix (BRIEF.md): the venue renders paint "Sporting Hub Hong Kong"
+   script lettering on the court floor, starting around 71-74% down the
+   frame (measured with vision_analyze on render-1.jpg and render-2.jpg),
+   which collided with the hero lead line and lockup in visual QA of the
+   mockup. Fix: make the image box taller than its clipped slide and anchor
+   it to the top (object-position 50% 0), so only the top portion of the
+   render shows. height:130% (visible fraction 1/1.3 = 76.9%) still let the
+   top edge of the lettering peek through, confirmed in re-shot QA; raised
+   to 145% (the brief's stated ceiling), visible fraction 1/1.45 = 69.0%,
+   comfortably above the lettering's 71% start on every slide -- the
+   skylight and court stay in frame, the floor logo falls fully below the
+   visible crop on all five slides. No inline object-position on the <img>
+   tags (see index.html): this single rule governs every hero slide
+   uniformly. */
+.hero-slide img{ width:100%; height:145%; object-fit:cover; object-position:50% 0; display:block; }
+
+.hero-dots{ position:absolute; z-index:4; right:16px; bottom:16px; display:flex; gap:2px; }
+@media(min-width:760px){ .hero-dots{ right:24px; bottom:24px; } }
+.hero-dot{ width:22px; height:44px; padding:0; background:transparent; display:flex; align-items:center; justify-content:center; flex:none; }
+.hero-dot::before{ content:""; width:9px; height:9px; border-radius:50%; background:rgba(251,243,228,.55); transition:all var(--dur) var(--ease); }
+.hero-dot.is-active::before{ width:20px; border-radius:var(--r-pill); background:var(--court-cream); }
+
+.hero-arrow{
+  position:absolute; z-index:4; top:50%; margin-top:-22px; width:44px; height:44px; border-radius:50%;
+  background:rgba(17,37,72,.35); color:var(--court-cream); display:flex; align-items:center; justify-content:center;
+  opacity:0; transition:opacity var(--dur) var(--ease),background var(--dur) var(--ease); flex:none;
+}
+.hero-slideshow:hover .hero-arrow,.hero-arrow:focus-visible{ opacity:1; }
+.hero-arrow:hover{ background:rgba(17,37,72,.55); }
+.hero-arrow.prev{ left:16px; } .hero-arrow.next{ right:16px; }
+@media(min-width:760px){ .hero-arrow.prev{ left:24px; } .hero-arrow.next{ right:24px; } }
+.hero-arrow svg{ width:18px; height:18px; }
+
+.hero-actions{ display:flex; flex-wrap:wrap; gap:12px; margin-top:6px; }
+
+/* full-height slideshow for the home hero */
+.hero-a .hero-slideshow{ height:78vh; min-height:560px; }
+@media(min-width:1000px){
+  .hero-a .hero-slideshow{ height:min(88vh,860px); min-height:640px; }
+}
+
+/* ---- variant A: full bleed ---- */
+.hero-a{ padding-top:0; }
+.hero-a .hero-slideshow{ border-radius:0 0 var(--r-hero) var(--r-hero); }
+/* Bug fix versus the approved mockup: .hero-text-block is also .wrap
+   (markup is class="wrap hero-text-block"), and .wrap's own horizontal
+   gutter (padding:0 var(--gut)) was being fully overwritten by this rule's
+   shorthand `padding:28px 0 48px` (0 left/right), since both write the
+   `padding` shorthand and this rule is declared later in the cascade. The
+   approved mockup screenshot (shots/hero-A-mobile.png) shows the same
+   defect: the eyebrow and lead text sit flush against the viewport's left
+   edge on mobile with no side margin, contradicting DESIGN.md's own
+   spacing rule ("side gutter 20px mobile"). Not part of "sections, order,
+   photo slots, arch count, scrim rules, radii" that the brief freezes; a
+   text-flush-to-the-edge legibility bug is fixed here, adding the gutter
+   back via padding-left/right instead of clobbering it. */
+.hero-a .hero-text-block{ padding:28px var(--gut) 48px; max-width:1136px; }
+@media(min-width:760px){ .hero-a .hero-text-block{ padding:40px var(--gut) 64px; } }
+@media(min-width:1000px){ .hero-a .hero-text-block{ padding:56px var(--gut) 72px; } }
+
+/* ============ pillars (section 2) ============ */
+#pillars{ scroll-margin-top:90px; }
+.pillars-grid{ display:grid; gap:14px; }
+/* Review fix 2026-09-09 (Alfred, point 2): the three tiles were 1.15fr / 1fr /
+   1.15fr with the middle one 12% shorter and the row bottom-aligned, which
+   DESIGN.md had asked for ("deliberately not identical in height"). Alfred
+   reviewed it and wants three equal, aligned tiles, so the stagger is
+   withdrawn and DESIGN.md updated to match. */
+@media(min-width:760px){ .pillars-grid{ grid-template-columns:repeat(3,1fr); align-items:stretch; gap:16px; } }
+.pillar-tile{
+  position:relative; display:block; border-radius:var(--r-tile); overflow:hidden;
+  aspect-ratio:4/3; transition:transform var(--dur) var(--ease);
+}
+.pillar-tile:hover{ transform:translateY(-2px); }
+@media(min-width:760px){
+  /* tablet: three columns of 221px at 760px would be 2:1 portrait slivers at a
+     fixed 440px; let them scale at 3:4 until the desktop breakpoint */
+  .pillar-tile{ aspect-ratio:3/4; }
+}
+@media(min-width:1000px){
+  .pillar-tile{ aspect-ratio:auto; height:440px; }
+}
+.pillar-tile .tile-arrow{
+  position:absolute; z-index:3; top:14px; right:14px; width:44px; height:44px; border-radius:50%;
+  background:var(--raised-cream); color:var(--sideline-navy); display:flex; align-items:center; justify-content:center;
+  transition:background var(--dur) var(--ease);
+}
+.pillar-tile .tile-arrow svg{ width:18px; height:18px; }
+.pillar-tile:hover .tile-arrow{ background:var(--court-cream); }
+/* Pillar tile label overrides the generic .tile-text .h-tile band-fit size
+   (20/24px) back up to the Tile label step per DESIGN.md Typography table
+   and Components > Service pillar tile: "label in Outfit 700 28px in Court
+   cream at bottom-left". Higher specificity than .tile-text .h-tile (3
+   classes vs 2) so it wins regardless of source order. */
+.pillar-tile .tile-text .h-tile{ font-size:var(--fs-tile); line-height:1.15; margin-bottom:4px; }
+/* Review fix 2026-09-09 (Alfred, point 2, "the right most box photo is not
+   filled in the container"). The photo did reach every edge; what read as
+   unfilled was the framing: render-4 at natural scale put exposed ceiling in
+   the top half of the tile with the content squashed into the bottom 40%,
+   while the two tiles beside it are cropped tight. Six crops were rendered
+   and compared; this one won on every criterion: render-3's left third
+   (training rig, dark shelving, blue ottomans), zoomed 1.35x and anchored
+   bottom-left so no ceiling is in frame and it reads as a training floor.
+   Full-resolution source so the zoom does not soften it. Still a placeholder
+   until Suki shoots the real S&C floor. */
+.pillar-tile .pt-crop{ object-position:0% 50%; transform:scale(1.35); transform-origin:0% 100%; }
+
+/* ============ brand intro (section 3) ============ */
+.intro-grid{ display:grid; gap:32px; }
+.intro-photo{ order:-1; width:80%; margin:0 auto; }
+@media(min-width:900px){
+  .intro-grid{ grid-template-columns:minmax(0,560px) 1fr; align-items:center; gap:56px; }
+  .intro-photo{ order:2; width:100%; margin:0; justify-self:end; max-width:400px; }
+}
+.intro-photo .arch{ aspect-ratio:4/5; }
+.intro-text{ max-width:560px; }
+
+/* ============ courts and spaces (section 4) ============ */
+/* Mobile: two columns, the two wide tiles span both, every row is either one
+   wide tile or two standard tiles, so rows are always level. */
+.spaces-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+.space-tile{ position:relative; border-radius:var(--r-tile); overflow:hidden; aspect-ratio:4/3; }
+.space-tile.is-wide{ grid-column:span 2; aspect-ratio:16/9; }
+/* Review fix 2026-09-09 (Alfred, point 3). Before: four columns, wide tiles
+   span 2 columns at 16:8 (340px tall) next to 4:3 standards (249px tall), so
+   every row was as tall as its wide tile and the two standards beside it sat
+   over 91px of empty cream; and 8 tiles worth 10 column-units in a 4-column
+   grid left a 2-cell hole at the end of the last row. Now a fixed bento: 4
+   columns by 6 row-units, standard tile = 1 column by 2 units (4:3), wide
+   tile = 2 columns by 3 units (16:9). Left column pair holds the two wides
+   (3 + 3 = 6 units), right pair holds six standards (2 + 2 + 2 = 6), so the
+   grid is fully covered with no holes and every edge lines up. Tile heights
+   come from the grid tracks, not from aspect-ratio: the grid itself carries
+   the aspect ratio (1376 / 779 is the exact figure at 1440px, and the
+   standard tiles stay within 1% of 4:3 between 760px and the 1680px
+   bleed cap). Reading order is unchanged: volleyball, basketball,
+   pickleball, badminton, S&C, lounge, retail, recovery. */
+@media(min-width:760px){
+  .spaces-grid{
+    grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(6,minmax(0,1fr));
+    grid-auto-flow:row dense; gap:16px; aspect-ratio:1376/779;
+  }
+  .space-tile{ aspect-ratio:auto; grid-row:span 2; min-height:0; }
+  .space-tile.is-wide{ aspect-ratio:auto; grid-column:span 2; grid-row:span 3; }
+}
+.space-tile .court-dia{ position:absolute; z-index:3; right:14px; bottom:14px; width:64px; }
+@media(min-width:760px){ .space-tile .court-dia{ width:80px; } }
+@media(min-width:1000px){ .space-tile .court-dia{ width:96px; } }
+.space-tile.is-panel{
+  display:flex; align-items:flex-end; background:var(--cool-panel); border:1px solid var(--hairline);
+}
+.space-tile.is-panel .tile-text .h-tile{ color:var(--deep-navy); }
+
+/* ============ just performance (section 5) ============ */
+.jp-panel{ background:var(--cool-panel); border-radius:var(--r-panel); padding:28px var(--card-pad); }
+@media(min-width:1000px){ .jp-panel{ padding:56px; } }
+.jp-grid{ display:grid; gap:28px; }
+@media(min-width:1000px){ .jp-grid{ grid-template-columns:minmax(0,400px) 1fr; gap:48px; align-items:start; } }
+.jp-text{ max-width:420px; }
+.jp-coaches{ display:flex; gap:16px; }
+@media(min-width:1000px){
+  /* CSS Grid, not flex-wrap: with three flex:1 items and a min-width, the
+     available row width did not clear 3*min-width, so the third card
+     wrapped alone and stretched full-width instead of matching its
+     siblings. A fixed 3-column grid guarantees three equal columns. */
+  .jp-coaches{ display:grid; grid-template-columns:repeat(3, 1fr); }
+}
+.coach-card{
+  flex:0 0 250px; scroll-snap-align:start; background:var(--raised-cream); border:1px solid var(--hairline);
+  border-radius:var(--r-card); padding:var(--card-pad);
+}
+@media(min-width:1000px){ .coach-card{ flex:none; min-width:0; } }
+.coach-avatar{ width:60px; height:60px; border-radius:50%; background:var(--cool-panel); border:1px solid var(--hairline); margin-bottom:14px; }
+.coach-card .h-coach{ font-family:var(--f-display); font-weight:700; font-size:17px; color:var(--deep-navy); margin:0 0 6px; }
+.coach-card .coach-meta{ font-size:14px; color:var(--meta-grey); margin:0 0 4px; }
+.coach-card .chips{ display:flex; flex-wrap:wrap; gap:6px; margin:12px 0; }
+.chip{
+  border:1px solid var(--court-line-blue); border-radius:var(--r-pill); padding:4px 11px;
+  font-family:var(--f-garnish); font-weight:700; text-transform:uppercase; letter-spacing:.05em;
+  font-size:12px; color:var(--sideline-navy); display:inline-flex; align-items:center; min-height:26px;
+}
+.coach-card .coach-size{ font-size:14px; color:var(--charcoal); font-weight:600; margin-bottom:4px; }
+.coach-card .coach-price{ font-size:14px; margin-bottom:14px; }
+.coach-card .btn{ width:100%; height:44px; font-size:15px; }
+
+/* ============ corporate + shop (section 6) ============ */
+.corp-shop-grid{ display:grid; gap:24px; }
+@media(min-width:900px){ .corp-shop-grid{ grid-template-columns:7fr 5fr; gap:28px; align-items:stretch; } }
+
+.corp-block{
+  background:var(--raised-cream); border:1px solid var(--hairline); border-radius:var(--r-tile);
+  padding:var(--card-pad); display:grid; gap:22px; height:100%;
+}
+@media(min-width:640px){ .corp-block{ grid-template-columns:180px 1fr; gap:26px; align-items:center; } }
+@media(min-width:900px){ .corp-block{ grid-template-columns:220px 1fr; } }
+.corp-block .arch{ aspect-ratio:4/5; }
+.corp-actions{ display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+
+.shop-tile{ position:relative; border-radius:var(--r-tile); overflow:hidden; min-height:320px; }
+@media(min-width:900px){ .shop-tile{ min-height:0; height:100%; } }
+
+/* ============ book band (section 7) ============ */
+.book-band{
+  background:var(--deep-navy); border-radius:var(--r-panel); padding:36px var(--card-pad);
+  position:relative; overflow:hidden; color:var(--court-cream);
+}
+@media(min-width:1000px){ .book-band{ padding:60px; } }
+.book-band::after{
+  content:""; position:absolute; inset:12px; border-radius:calc(var(--r-panel) - 4px);
+  border:1.5px solid rgba(151,174,214,.35); pointer-events:none;
+}
+.book-band .watermark{ position:absolute; right:-30px; bottom:-24px; width:300px; height:auto; color:var(--court-line-blue); opacity:.08; pointer-events:none; }
+@media(min-width:760px){ .book-band .watermark{ width:380px; } }
+.book-band-inner{ position:relative; z-index:1; max-width:640px; }
+.book-band-sub{ font-size:16px; color:rgba(251,243,228,.82); margin:0 0 24px; }
+.book-band-sports{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px; }
+.book-band-links{ display:flex; gap:24px; flex-wrap:wrap; }
+
+/* ============ find us (section 8) ============ */
+.find-grid{ display:grid; gap:28px; }
+@media(min-width:900px){ .find-grid{ grid-template-columns:1fr 1fr; gap:48px; align-items:start; } }
+.badge-card{
+  background:var(--raised-cream); border:1px solid var(--hairline); border-radius:var(--r-card);
+  padding:32px; display:flex; align-items:center; justify-content:center; height:100%;
+}
+.badge-card img{ width:340px; max-width:100%; height:auto; }
+.facts-row{ display:grid; grid-template-columns:118px 1fr; gap:12px; padding:14px 0; border-bottom:1px solid var(--hairline); }
+.facts-row:first-child{ border-top:1px solid var(--hairline); }
+.facts-row dt{ margin:0; font-family:var(--f-display); font-weight:600; font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--sideline-navy); }
+.facts-row dd{ margin:0; font-size:16px; }
+.facts-row dd a{ display:inline-flex; align-items:center; min-height:44px; }
+.find-actions{ display:flex; flex-wrap:wrap; gap:12px; margin-top:24px; }
+.map-tile{
+  margin-top:32px; background:var(--cool-panel); border:1px solid var(--hairline); border-radius:var(--r-tile);
+  height:280px; display:flex; align-items:center; justify-content:center; text-align:center; padding:20px;
+}
+.map-tile .meta{ max-width:36ch; }
+
+/* ============ footer (section 9) ============ */
+.site-footer{ background:var(--deep-navy); color:var(--court-cream); padding:56px 0 28px; }
+.footer-grid{ display:grid; gap:32px; }
+@media(min-width:760px){ .footer-grid{ grid-template-columns:1.3fr 1fr 1fr 1fr; gap:24px; } }
+.footer-lockup{ width:150px; color:var(--court-cream); margin-bottom:14px; display:flex; align-items:center; min-height:44px; }
+.footer-blurb{ font-size:14px; color:rgba(251,243,228,.7); max-width:32ch; margin-bottom:18px; }
+.footer-col h4{ font-family:var(--f-garnish); font-weight:700; text-transform:uppercase; letter-spacing:.06em; font-size:13px; color:var(--court-line-blue); margin:0 0 14px; }
+.footer-col ul{ display:grid; gap:2px; }
+.footer-col a{ font-size:15px; color:rgba(251,243,228,.8); display:flex; align-items:center; min-height:44px; }
+.footer-lang{ margin-top:6px; }
+.footer-lang .lang-toggle{ border-color:rgba(151,174,214,.35); }
+.footer-lang .lang-toggle button{ color:var(--court-cream); }
+.footer-lang .lang-toggle button[aria-pressed="true"]{ background:var(--court-cream); color:var(--sideline-navy); }
+.footer-bottom{
+  border-top:1px solid var(--hairline-on-navy); margin-top:40px; padding-top:20px;
+  display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; font-size:13px; color:rgba(251,243,228,.65);
+}
+
+/* ============ WhatsApp float ============ */
+.wa-float{
+  position:fixed; z-index:60; right:16px; bottom:16px; width:56px; height:56px; border-radius:50%;
+  background:var(--wa-green); display:flex; align-items:center; justify-content:center; box-shadow:0 3px 12px rgba(49,62,101,.20);
+}
+@media(min-width:760px){ .wa-float{ right:24px; bottom:24px; width:60px; height:60px; } }
+.wa-float svg{ width:26px; height:26px; }
+.wa-float svg path{ fill:var(--court-cream); }
+
+/* ============ tweaks panel ============ */
+.tweaks-panel{
+  position:fixed; z-index:80; left:16px; bottom:16px; width:224px;
+  background:var(--raised-cream); border:1px solid var(--hairline); border-radius:var(--r-card);
+  padding:14px; box-shadow:var(--shadow-float); display:flex; flex-direction:column; gap:12px;
+}
+html.clean .tweaks-panel{ display:none !important; }
+.tweaks-title{ font-family:var(--f-display); font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--deep-navy); }
+.tweaks-row{ display:flex; flex-direction:column; gap:6px; }
+.tweaks-label{ font-family:var(--f-body); font-weight:600; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--meta-grey); }
+.tweaks-btns{ display:flex; gap:6px; }
+.tweaks-btns button{
+  flex:1; min-height:44px; border:1px solid var(--hairline); border-radius:var(--r-pill);
+  font-family:var(--f-display); font-weight:600; font-size:13px; color:var(--deep-navy); padding:0 6px;
+}
+.tweaks-btns button[aria-pressed="true"]{ background:var(--sideline-navy); color:var(--court-cream); border-color:var(--sideline-navy); }
+
+/* ============ responsive overflow guards ============ */
+.pillars-grid > *,.spaces-grid > *,.intro-grid > *,.jp-grid > *,.corp-shop-grid > *,
+.find-grid > *,.footer-grid > *,.corp-block > *{ min-width:0; }

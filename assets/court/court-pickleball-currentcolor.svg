@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 106.15 94.01">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: currentColor;
+      }
+    </style>
+  </defs>
+  <g id="Layer_1-2" data-name="Layer 1">
+    <g>
+      <g>
+        <path class="cls-1" d="M106.15,94.01H0l.05-.22L21.57,0h63.01l.03.14,21.54,93.87ZM.45,93.65h105.25L84.29.36H21.86L.45,93.65Z"/>
+        <polygon class="cls-1" points="80.53 15.57 26.2 15.57 17.65 15.21 89.16 15.21 80.53 15.57"/>
+        <polygon class="cls-1" points="97.92 59.54 7.91 59.54 17.56 59.19 89.16 59.19 97.92 59.54"/>
+        <rect class="cls-1" x="53.18" y="15.39" width=".36" height="43.98"/>
+      </g>
+      <rect class="cls-1" x="14.04" y="20.17" width="78.66" height=".18"/>
+      <rect class="cls-1" x="14.04" y="22.82" width="78.66" height=".18"/>
+      <rect class="cls-1" x="14.04" y="25.12" width="78.66" height=".18"/>
+      <rect class="cls-1" x="14.04" y="27.78" width="78.66" height=".18"/>
+      <rect class="cls-1" x="14.04" y="30.08" width="78.66" height=".18"/>
+      <rect class="cls-1" x="14.04" y="32.01" width="78.66" height=".18"/>
+      <rect class="cls-1" x="14.04" y="34.66" width="78.66" height=".18"/>
+      <rect class="cls-1" x="65.05" y="20.26" width=".18" height="14.49"/>
+      <rect class="cls-1" x="68.53" y="20.26" width=".18" height="14.49"/>
+      <g>
+        <rect class="cls-1" x="17.47" y="20.26" width=".18" height="14.49"/>
+        <rect class="cls-1" x="19.84" y="20.26" width=".18" height="14.49"/>
+        <rect class="cls-1" x="23.32" y="20.26" width=".18" height="14.49"/>
+        <rect class="cls-1" x="26.8" y="20.26" width=".18" height="14.49"/>
+        <rect class="cls-1" x="30.28" y="20.26" width=".18" height="14.49"/>
+        <rect class="cls-1" x="33.75" y="20.26" width=".18" height="14.49"/>
+        <rect class="cls-1" x="37.23" y="20.26" width=".18" height="14.49"/>
+        <rect class="cls-1" x="40.71" y="20.26" width=".18" height="14.49"/>
+        <rect class="cls-1" x="44.19" y="20.26" width=".18" height="14.49"/>
+        <rect class="cls-1" x="47.66" y="20.26" width=".18" height="14.49"/>
+        <rect class="cls-1" x="51.14" y="20.26" width=".18" height="14.49"/>
+        <rect class="cls-1" x="54.62" y="20.26" width=".18" height="14.49"/>
+        <rect class="cls-1" x="58.1" y="20.26" width=".18" height="14.49"/>
+        <rect class="cls-1" x="61.57" y="20.26" width=".18" height="14.49"/>
+        <rect class="cls-1" x="72.01" y="20.26" width=".18" height="14.49"/>
+        <rect class="cls-1" x="75.48" y="20.26" width=".18" height="14.49"/>
+        <rect class="cls-1" x="78.96" y="20.26" width=".18" height="14.49"/>
+        <rect class="cls-1" x="82.44" y="20.26" width=".18" height="14.49"/>
+        <rect class="cls-1" x="85.92" y="20.26" width=".18" height="14.49"/>
+        <rect class="cls-1" x="89.4" y="20.26" width=".18" height="14.49"/>
+      </g>
+      <path class="cls-1" d="M13.61,36.21c-.4,0-.72-.32-.72-.72v-16.22c0-.4.32-.72.72-.72s.72.32.72.72v16.22c0,.4-.32.72-.72.72Z"/>
+      <path class="cls-1" d="M93.05,36.21c-.4,0-.72-.32-.72-.72v-16.22c0-.4.32-.72.72-.72s.72.32.72.72v16.22c0,.4-.32.72-.72.72Z"/>
+    </g>
+  </g>
+</svg>

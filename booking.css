@@ -1,0 +1,339 @@
+/* Sporting Hub Hong Kong — prototype v2 booking flow skin
+   Source: v1 booking.html's own inline <style> block (lines 11-175 of
+   html/prototype/booking.html), which held almost all of the booking flow's
+   visual rules (.bk-head, .rail, .opt, .tag, .chip, .date, .slotgrid,
+   .tslot, .form, .summary, .bar, .cr, .done-mark, .recap), retokenised to
+   the v2 design system per BRIEF.md "Skin" section and the booking-flow-
+   ux-inventory.md. Every selector below targets the SAME class names and
+   the SAME DOM v1 shipped (the UX and markup are frozen); only colour,
+   type, radius and spacing values change.
+   Loaded after tokens.css and site.css. site.css supplies the cross-cutting
+   atoms this page reuses unchanged: .nav-lockup, .lang-toggle, .btn and its
+   variants, .price-tbc, the CSS reset, body base font/colour, h1-h4,
+   .eyebrow, .meta, and section padding (inventory 6.3: "`.lang`, `.btn` and
+   its variants, `.price-tbc`, `.wa`, the root tokens, and the base
+   `body`/`a`/`.wrap`/`h1-h4`/`.meta`/`section` rules do apply and are in
+   scope" for a stylesheet-only reskin -- those now live once in site.css
+   instead of being duplicated here). This file holds only what is unique to
+   the booking flow.
+
+   Retokenisation map used throughout (inventory 6.2 / 6.3):
+     --cream -> --court-cream   --raised -> --raised-cream
+     --navy  -> --sideline-navy --deep   -> --deep-navy
+     --ink   -> --charcoal      --lineblue -> --court-line-blue
+     --rust  -> --leather-rust  --meta   -> --meta-grey
+     --hair  -> --hairline      --cool   -> --cool-panel
+     --courtink -> --court-ink
+   rgba() literals recomputed from the v2 hex (inventory 6.2's table maps
+   each old rgba to the token it stood in for):
+     rgba(151,174,214,x) -> court-line-blue #97AED6 at x
+     rgba(30,68,137,x)   -> sideline-navy   #1E4489 at x
+     rgba(17,37,72,x)    -> court-ink       #112548 at x
+     rgba(251,243,228,x) -> court-cream     #FBF3E4 at x
+     rgba(49,62,101,x)   -> deep-navy       #313E65 at x
+     rgba(124,70,28,x)   -> leather-rust    #7C461C at x
+   The four #fff literals (line 59 .opt.sel, line 168 .done-mark svg) are
+   replaced with Raised cream, which is the closest token-backed fit for a
+   "brighter than the card" selected/success surface on the Court cream
+   ground; kept OFF the rust family since Raised cream is a neutral surface,
+   not a tint. */
+
+/* ============ reset + base + shared atoms ============
+   Ported unchanged (values, not rule-for-rule wording) from site.css's own
+   copy of the same rules, since booking.html loads only tokens.css and
+   this file -- matching v1's own architecture (booking.html loaded only
+   _shared.css, never index.html's page-only styles) and the inventory's
+   own scoping note: "Not all of _shared.css applies to the booking flow.
+   .nav, .burger, .drawer, .scrim, .frame, .band-cool, .band-deep, and
+   footer.site have no matching markup in booking.html... .lang, .btn and
+   its variants, .price-tbc, .wa, the root tokens, and the base
+   body/a/.wrap/h1-h4/.meta/section rules do apply and are in scope." This
+   block is that same short list, v2 tokens, nothing marketing-page-only
+   (no hero, pillars, spaces, jp-panel, corp-shop, book-band, find-grid,
+   footer -- booking.html has no matching markup for any of those). */
+*,*::before,*::after{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; }
+html,body{ max-width:100%; overflow-x:hidden; }
+body{
+  margin:0; background:var(--court-cream); color:var(--charcoal);
+  font-family:var(--f-body); font-size:var(--fs-body); line-height:1.6;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+}
+img{ max-width:100%; display:block; }
+a{ color:inherit; text-decoration:none; }
+ul{ margin:0; padding:0; list-style:none; }
+button{ font:inherit; color:inherit; background:none; border:0; cursor:pointer; }
+svg{ display:block; }
+p{ margin:0 0 14px; }
+p:last-child{ margin-bottom:0; }
+:focus-visible{ outline:2px solid var(--sideline-navy); outline-offset:2px; }
+.wrap{ max-width:var(--wrap); margin:0 auto; padding:0 var(--gut); }
+.wrap *{ min-width:0; }
+h1,h2,h3,h4{ margin:0; font-family:var(--f-display); color:var(--deep-navy); }
+.meta{ font-family:var(--f-body); font-weight:500; font-size:var(--fs-meta); color:var(--meta-grey); }
+
+/* ---- buttons: pills, height 52/56px per DESIGN.md Buttons ---- */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  height:52px; padding:0 26px; border-radius:var(--r-pill); border:2px solid transparent;
+  font-family:var(--f-display); font-weight:600; font-size:17px; white-space:nowrap;
+  transition:background var(--dur) var(--ease),color var(--dur) var(--ease),border-color var(--dur) var(--ease);
+}
+@media(min-width:760px){ .btn{ height:56px; padding:0 30px; font-size:18px; } }
+.btn-primary{ background:var(--sideline-navy); color:var(--court-cream); }
+.btn-primary:hover{ background:var(--deep-navy); }
+/* v1 named the secondary/outline booking button .btn-ghost (S8's "Book
+   something else" link); kept as v1's own class name, since renaming a
+   class is a markup change and BRIEF.md only allows head/header markup
+   edits plus the data-i18n to data-str rename. Same visual role as
+   site.css's .btn-secondary on the marketing pages. */
+.btn-ghost{ background:transparent; border-color:var(--hairline); color:var(--sideline-navy); }
+.btn-ghost:hover{ border-color:var(--sideline-navy); }
+.btn[disabled],.btn.is-disabled{ opacity:.4; cursor:not-allowed; }
+
+/* ---- language toggle, same component as site.css's nav ---- */
+.lang-toggle{ display:inline-flex; align-items:center; border:1px solid var(--hairline); border-radius:var(--r-pill); padding:3px; gap:2px; }
+.lang-toggle button{
+  font-family:var(--f-display); font-weight:600; font-size:15px; height:44px; padding:0 14px;
+  border-radius:var(--r-pill); color:var(--deep-navy); display:flex; align-items:center; justify-content:center;
+}
+.lang-toggle button[aria-pressed="true"]{ background:var(--sideline-navy); color:var(--court-cream); }
+
+/* ---- nav lockup, reused inside .bk-head ---- */
+.nav-lockup{ color:var(--sideline-navy); display:flex; align-items:center; min-height:44px; }
+.nav-lockup svg{ width:100%; height:auto; display:block; }
+
+/* ---- price placeholder ---- */
+.price-tbc{ color:var(--meta-grey); font-weight:600; }
+
+/* ---- floating WhatsApp button ---- */
+.wa-float{
+  position:fixed; z-index:60; right:16px; bottom:16px; width:56px; height:56px; border-radius:50%;
+  background:var(--wa-green); display:flex; align-items:center; justify-content:center; box-shadow:0 3px 12px rgba(49,62,101,.20);
+}
+@media(min-width:760px){ .wa-float{ right:24px; bottom:24px; width:60px; height:60px; } }
+.wa-float svg{ width:26px; height:26px; }
+.wa-float svg path{ fill:var(--court-cream); }
+body.in-checkout .wa-float{ display:none; }
+/* Fix 2026-09-07 (defect 1): restore v1's _shared.css line 108 behaviour.
+   While the 75px sticky .bar is visible (booking.html body carries
+   has-bar, .bar is display:none from 960px), lift the float clear of it
+   so it no longer overlaps .barNext. Scoped to booking.html only via the
+   has-bar class, which index.html's body never sets. */
+@media(max-width:959px){
+  body.has-bar .wa-float{ bottom:calc(91px + env(safe-area-inset-bottom)); }
+}
+
+/* ============ head + rail ============ */
+body{ background:var(--court-cream); }
+.bk-head{
+  position:sticky; top:0; z-index:40; background:var(--raised-cream); border-bottom:1px solid var(--hairline);
+}
+.bk-head .in{ display:flex; align-items:center; gap:12px; height:64px; }
+.bk-head .nav-lockup{ width:124px; }
+.backbtn{
+  border:1px solid var(--hairline); background:transparent; border-radius:var(--r-pill); min-height:44px;
+  padding:0 16px; cursor:pointer; font:600 14px Figtree,"Noto Sans TC",sans-serif; color:var(--deep-navy);
+  display:inline-flex; align-items:center; gap:6px;
+}
+.backbtn:hover{ border-color:var(--sideline-navy); }
+.bk-head .right{ margin-left:auto; display:flex; gap:10px; align-items:center; }
+
+/* step rail: v1's exact DOM, .rail (outer, scrolls) > ol#rail (flex) > li.
+   Markers bumped from v1's 22px to 28px per DESIGN.md "Booking step rail:
+   markers are 28px circles." */
+.rail{
+  background:var(--cool-panel); border-bottom:1px solid var(--hairline); overflow-x:auto;
+  -webkit-overflow-scrolling:touch; scrollbar-width:none;
+}
+.rail::-webkit-scrollbar{ display:none; }
+.rail ol{ display:flex; gap:0; list-style:none; margin:0; padding:12px var(--gut); min-width:max-content; }
+.rail li{
+  display:flex; align-items:center; gap:9px; padding-right:16px; margin-right:16px;
+  border-right:1px solid var(--hairline); white-space:nowrap;
+}
+.rail li:last-child{ border-right:0; margin-right:0; padding-right:0; }
+.rail .n{
+  width:28px; height:28px; border-radius:50%; border:1.5px solid var(--hairline);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--f-display); font-weight:700; font-size:12.5px; color:var(--meta-grey); flex:none;
+}
+.rail .t{ font-family:var(--f-body); font-size:14px; color:var(--meta-grey); font-weight:500; }
+.rail li.on .n{ background:var(--sideline-navy); border-color:var(--sideline-navy); color:var(--court-cream); }
+.rail li.on .t{ color:var(--deep-navy); font-weight:600; }
+.rail li.done .n{ background:var(--court-line-blue); border-color:var(--court-line-blue); color:var(--court-ink); }
+.rail li.done .t{ color:var(--sideline-navy); }
+
+/* ============ layout ============ */
+.bk{ padding:32px 0 120px; }
+@media(min-width:960px){
+  .bk{ padding:44px 0 60px; }
+  .bk .in{ display:grid; grid-template-columns:minmax(0,1fr) 336px; gap:38px; align-items:start; }
+}
+/* Booking screens keep their tighter rhythm per BRIEF.md Skin: ".screen h1
+   at 26/34 is fine, but Outfit on labels and buttons" -- h1 already
+   inherits Outfit from site.css's global h1-h4 rule; only the size differs
+   from the marketing-page scale, which is why it is set here per screen. */
+.screen{ display:none; }
+.screen.on{ display:block; }
+.screen h1{ font-size:26px; margin-bottom:6px; }
+@media(min-width:760px){ .screen h1{ font-size:34px; } }
+.screen .sub{ color:var(--meta-grey); font-size:15px; margin-bottom:20px; }
+
+/* ============ option cards ============ */
+.opts{ display:grid; gap:10px; }
+@media(min-width:620px){ .opts.two{ grid-template-columns:1fr 1fr; } }
+.opt{
+  background:var(--raised-cream); border:1px solid var(--hairline); border-radius:var(--r-card); padding:14px 15px;
+  cursor:pointer; text-align:left; font:inherit; color:inherit; display:flex; gap:13px; align-items:center;
+  width:100%; position:relative; overflow:hidden; transition:border-color .16s,background .16s;
+}
+.opt:hover{ border-color:var(--sideline-navy); }
+/* .opt.sel: v1 used a literal #fff fill to lift the selected card off the
+   Raised-cream page background. Raised cream is already both the resting
+   card colour AND the page's card ground in this system, so reusing it for
+   .sel would add no visible fill contrast. Use a light navy wash instead,
+   computed at 5% alpha from --sideline-navy (rgba(30,68,137,.05), the same
+   hand-converted-from-token pattern the inventory documents for .cr's rust
+   wash), plus the heavier border and the one system shadow level, so the
+   selected state reads as lifted and tinted, not just outlined. */
+.opt.sel{ border-color:var(--sideline-navy); border-width:1.5px; background:rgba(30,68,137,.05); box-shadow:var(--shadow-float); }
+.opt .dia{ width:92px; height:81px; flex:none; color:var(--court-line-blue); }
+.opt .dia svg{ width:92px; height:81px; display:block; }
+.opt .av{ width:56px; height:56px; border-radius:50%; flex:none; background:var(--cool-panel);
+  display:flex; align-items:center; justify-content:center; color:var(--sideline-navy); border:1px solid var(--hairline); }
+.opt .av svg{ width:26px; height:26px; }
+.opt .txt{ flex:1; min-width:0; display:block; }
+.opt .t,.opt .d{ display:block; }
+.opt .t{ font-family:var(--f-display); font-weight:700; font-size:16px; color:var(--deep-navy); }
+.opt .d{ font-size:13.5px; color:var(--meta-grey); margin-top:3px; }
+.opt .p{ font-weight:600; font-size:14.5px; color:var(--deep-navy); white-space:nowrap; margin-left:auto; align-self:flex-start; }
+.opt .tags{ display:flex; flex-wrap:wrap; gap:5px; margin-top:7px; }
+.opt .d + .d{ margin-top:1px; }
+.tag{
+  font-family:var(--f-garnish); font-weight:700; text-transform:uppercase; letter-spacing:.05em;
+  font-size:11px; padding:1px 8px; border-radius:var(--r-pill); border:1px solid var(--court-line-blue); color:var(--sideline-navy);
+}
+html[lang="zh-Hant"] .tag{ font-family:"Noto Sans TC",sans-serif; letter-spacing:0; }
+
+/* ============ filter chips ============ */
+.chips{ display:flex; gap:7px; flex-wrap:wrap; margin-bottom:16px; }
+/* .chip min-height stays 36px per the inventory ("already 36px min-height
+   in the source; preserve as is unless told otherwise"), not the 44px tap
+   rule applied elsewhere. */
+.chip{
+  border:1px solid var(--hairline); background:transparent; border-radius:var(--r-pill); padding:7px 14px;
+  font:600 13.5px Figtree,"Noto Sans TC",sans-serif; color:var(--charcoal); cursor:pointer; min-height:36px;
+}
+.chip:hover{ border-color:var(--sideline-navy); }
+.chip.on{ background:var(--sideline-navy); border-color:var(--sideline-navy); color:var(--court-cream); }
+
+/* ============ date strip ============ */
+.dates{ display:flex; gap:7px; overflow-x:auto; padding-bottom:6px; margin-bottom:18px; scrollbar-width:none; }
+.dates::-webkit-scrollbar{ display:none; }
+.date{
+  flex:none; width:62px; border:1px solid var(--hairline); background:var(--raised-cream); border-radius:var(--r-pill);
+  padding:9px 4px; text-align:center; cursor:pointer; font:inherit; min-height:60px;
+}
+.date:hover{ border-color:var(--sideline-navy); }
+.date .dw{ font-family:var(--f-garnish); font-weight:700; text-transform:uppercase; letter-spacing:.05em; font-size:11.5px; color:var(--meta-grey); }
+.date .dn{ font-family:var(--f-display); font-weight:700; font-size:18px; color:var(--deep-navy); line-height:1.2; }
+.date.on{ background:var(--sideline-navy); border-color:var(--sideline-navy); }
+.date.on .dw{ color:var(--court-line-blue); } .date.on .dn{ color:var(--court-cream); }
+
+/* ============ slot grid ============
+   Slot chips at 44px per DESIGN.md "Date strip and slot grid: Slots are a
+   3-column grid on mobile and 6 on desktop, each a 44px pill." */
+.slotgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+@media(min-width:620px){ .slotgrid{ grid-template-columns:repeat(6,1fr); } }
+.tslot{
+  border:1px solid var(--hairline); background:var(--raised-cream); border-radius:var(--r-pill); min-height:44px;
+  font:600 14.5px Figtree,"Noto Sans TC",sans-serif; color:var(--deep-navy); cursor:pointer;
+}
+.tslot:hover:not(:disabled){ border-color:var(--sideline-navy); }
+.tslot.on{ background:var(--sideline-navy); border-color:var(--sideline-navy); color:var(--court-cream); }
+.tslot:disabled{
+  background:var(--hairline); border-color:var(--hairline); color:var(--meta-grey); cursor:not-allowed; text-decoration:line-through;
+}
+
+/* ============ form ============ */
+.form{ display:grid; gap:14px; max-width:560px; }
+.row2{ display:grid; gap:14px; }
+@media(min-width:560px){ .row2{ grid-template-columns:1fr 1fr; } }
+label.fl{ display:block; font-family:var(--f-display); font-weight:600; font-size:13.5px; color:var(--deep-navy); margin-bottom:5px; }
+input[type=text],input[type=email],input[type=tel],textarea,select{
+  width:100%; border:1px solid var(--hairline); border-radius:var(--r-input); background:var(--raised-cream);
+  padding:11px 12px; font:400 15.5px Figtree,"Noto Sans TC",sans-serif; color:var(--charcoal); min-height:44px;
+}
+textarea{ min-height:88px; resize:vertical; }
+input:focus,textarea:focus,select:focus{ border-color:var(--sideline-navy); }
+.check{ display:flex; gap:10px; align-items:flex-start; font-size:14px; cursor:pointer; }
+.check input{ margin-top:3px; width:17px; height:17px; flex:none; accent-color:var(--sideline-navy); }
+.warn{ color:var(--err); font-size:14px; font-weight:500; display:none; }
+.warn.on{ display:block; }
+
+/* ============ summary (desktop aside + s7 injected block) ============ */
+.summary{
+  background:var(--raised-cream); border:1px solid var(--hairline); border-radius:var(--r-card); padding:18px;
+  position:relative; overflow:hidden;
+}
+aside.summary{ display:none; }
+@media(min-width:960px){ aside.summary{ display:block; } }
+@media(min-width:960px){ .summary{ position:sticky; top:132px; } }
+.summary h3{ font-size:17px; margin-bottom:3px; }
+.summary .venue{ font-size:13.5px; color:var(--meta-grey); padding-bottom:13px; margin-bottom:13px; border-bottom:1px solid var(--hairline); }
+.li{ display:flex; justify-content:space-between; gap:12px; font-size:14.5px; padding:7px 0; }
+.li .k{ color:var(--charcoal); } .li .k small{ display:block; color:var(--meta-grey); font-size:12.5px; }
+.li .v{ font-weight:600; color:var(--deep-navy); white-space:nowrap; }
+.li.empty .v{ color:var(--meta-grey); font-weight:400; }
+.total{
+  display:flex; justify-content:space-between; gap:12px; margin-top:13px; padding-top:13px;
+  border-top:1.5px solid var(--sideline-navy); font-family:var(--f-display); font-weight:700; font-size:17px; color:var(--deep-navy);
+}
+.summary .btn{ width:100%; margin-top:15px; }
+.policy{ margin-top:13px; font-size:12.5px; color:var(--meta-grey); line-height:1.5; border-top:1px solid var(--hairline); padding-top:12px; }
+.sum-mobile{ display:block; }
+@media(min-width:960px){ .sum-mobile{ display:none; } }
+
+/* ============ mobile sticky bar ============ */
+.bar{
+  position:fixed; left:0; right:0; bottom:0; z-index:44; background:var(--raised-cream);
+  border-top:1px solid var(--hairline); box-shadow:var(--shadow-sticky);
+  padding:11px var(--gut) calc(11px + env(safe-area-inset-bottom)); display:flex; align-items:center; gap:14px;
+}
+@media(min-width:960px){ .bar{ display:none; } }
+.bar .amt{ flex:1; min-width:0; }
+.bar .amt .l{ font-family:var(--f-garnish); font-weight:700; text-transform:uppercase; letter-spacing:.06em; font-size:11.5px; color:var(--meta-grey); }
+html[lang="zh-Hant"] .bar .amt .l{ font-family:"Noto Sans TC",sans-serif; letter-spacing:0; }
+.bar .amt .v{ font-family:var(--f-display); font-weight:700; font-size:17px; color:var(--deep-navy); }
+.bar .btn{ flex:none; min-width:140px; }
+
+/* ============ change-request callout ============
+   BRIEF.md Skin: "the .cr callout on Cool panel with a hairline (no rust
+   tint, no left border stripe)". v1 filled it with a 5%-alpha rust tint and
+   a solid rust border, which reads as an accent colour covering a whole
+   panel (banned) and edges toward the banned coloured-border-stripe
+   pattern this system forbids on cards/callouts. Cool panel + a plain
+   hairline keeps the callout legible as "a note", not an alert, matching
+   how DESIGN.md reserves rust for one small emphasis moment per page, not
+   a callout box that appears up to three times on one screen. */
+.cr{
+  border:1px solid var(--hairline); border-radius:var(--r-card); padding:11px 13px; margin-bottom:18px;
+  font-size:13.5px; color:var(--charcoal); background:var(--cool-panel);
+}
+.cr b{
+  font-family:var(--f-garnish); text-transform:uppercase; letter-spacing:.06em;
+  color:var(--sideline-navy); font-size:11.5px; display:block; margin-bottom:3px; font-weight:700;
+}
+html[lang="zh-Hant"] .cr b{ font-family:"Noto Sans TC",sans-serif; letter-spacing:0; }
+
+/* ============ success screen ============ */
+.done-mark{ width:64px; height:64px; border-radius:50%; background:var(--ok); display:flex; align-items:center; justify-content:center; margin-bottom:18px; }
+.done-mark svg{ width:30px; height:30px; stroke:var(--raised-cream); stroke-width:2.6; fill:none; }
+.recap{
+  background:var(--raised-cream); border:1px solid var(--hairline); border-radius:var(--r-card); padding:18px;
+  max-width:460px; margin-bottom:20px; position:relative; overflow:hidden;
+}
+.recap .watermark{ position:absolute; right:-24px; bottom:-20px; width:150px; height:133px; color:var(--court-line-blue); opacity:.16; pointer-events:none; }
+.recap .watermark svg{ width:150px; height:133px; }
+.recap .li{ position:relative; z-index:1; }

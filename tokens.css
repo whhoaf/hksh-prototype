@@ -1,0 +1,92 @@
+/* Sporting Hub Hong Kong — prototype v2 design tokens
+   Source: design-systems/sporting-hub-hk/DESIGN.md v2. Copied unchanged from
+   html/mockup-v2/tokens.css (the brief names this file the single source of
+   tokens); shared by index.html and booking.html.
+   Do not hard-code a colour or radius anywhere else; add a token here instead. */
+
+:root{
+  /* ---------- colour ---------- */
+  --court-cream: #FBF3E4;      /* page ground */
+  --raised-cream: #FFFDF8;     /* cards, panels, sticky bars */
+  --sideline-navy: #1E4489;    /* primary action */
+  --deep-navy: #313E65;        /* headings, ink, dark panels */
+  --charcoal: #33343A;         /* body copy, never pure black */
+  --court-line-blue: #97AED6;  /* court markings, hairline diagrams, tints */
+  --court-ink: #112548;        /* court SVGs as shipped, photo scrim base */
+  --leather-rust: #7C461C;     /* sparing accent only */
+  --meta-grey: #6F7285;        /* captions, secondary copy */
+  --hairline: #E3D8C2;         /* 1px borders on cream */
+  --cool-panel: #EDF1F8;       /* cooler alternating band */
+
+  --ok: #2E7D4F;
+  --warn: #B07A18;
+  --err: #A8321F;
+  --wa-green: #25D366;
+
+  --hairline-on-navy: rgba(151,174,214,.28);
+
+  /* photo scrim gradients */
+  --scrim-bottom: linear-gradient(180deg, rgba(17,37,72,0) 35%, rgba(17,37,72,.66) 100%);
+  --scrim-top: linear-gradient(180deg, rgba(17,37,72,.45), rgba(17,37,72,0) 30%);
+
+  /* ---------- radius tokens: use these seven and nothing else (plus 50% for circles) ---------- */
+  --r-pill: 999px;
+  --r-input: 14px;
+  --r-card: 20px;
+  --r-tile: 24px;
+  --r-panel: 28px;
+  --r-hero: 36px;
+  --r-arch: 999px 999px 24px 24px; /* var(--r-tile) baked in */
+
+  /* ---------- shadow, one level ---------- */
+  --shadow-float: 0 2px 10px rgba(49,62,101,.08);
+  --shadow-sticky: 0 -2px 14px rgba(49,62,101,.07);
+
+  /* ---------- motion ---------- */
+  --ease: cubic-bezier(.22,.61,.36,1);
+  --dur: 180ms;
+
+  /* ---------- type families ---------- */
+  --f-display: 'Outfit', 'Noto Sans TC', sans-serif;
+  --f-body: 'Figtree', 'Noto Sans TC', sans-serif;
+  --f-garnish: 'Barlow Condensed', sans-serif;
+  --f-serif: 'EB Garamond', 'Noto Serif TC', serif;
+
+  /* ---------- type scale: mobile value, desktop applied at --bp-desktop ---------- */
+  --fs-hero: clamp(44px, 5.8vw, 84px);
+  --fs-section: 34px;
+  --fs-tile: 22px;
+  --fs-lead: 19px;
+  --fs-body: 17px;
+  --fs-ui: 17px;
+  --fs-meta: 14px;
+  --fs-eyebrow: 13px;
+
+  /* ---------- layout ---------- */
+  --wrap: 1200px;
+  --gut: 20px;
+  --text-col: 680px;
+  --section-gap: 72px;
+  --card-pad: 20px;
+
+  /* ---------- breakpoints (reference only, used as literal min-width in mockup.css) ---------- */
+  --bp-desktop: 1000px;
+}
+
+@media (min-width: 760px){
+  :root{
+    --gut: 32px;
+    --fs-section: 56px;
+    --fs-tile: 28px;
+    --fs-lead: 22px;
+    --fs-body: 17.5px;
+    --fs-ui: 18px;
+    --card-pad: 28px;
+  }
+}
+
+@media (min-width: 1000px){
+  :root{
+    --section-gap: 112px;
+  }
+}
