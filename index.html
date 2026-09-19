@@ -797,10 +797,14 @@ function initTweaksPanel(){
   if (params.get('clean') === '1') document.documentElement.classList.add('clean');
 
   /* Hosted-link switch (2026-09-09): ?view=client or ?view=dev sets the view
-     for this browser and, for client, also hides the tweaks panel, so a single
-     URL (index.html?view=client) can go to Suki and open clean on first visit.
-     The choice persists via localStorage exactly as if the panel had been
-     clicked, so booking.html and later visits keep it. */
+     for this browser, so a single URL can go to Suki and open clean on first
+     visit. The choice persists via localStorage exactly as if the panel had
+     been clicked, so booking.html and later visits keep it.
+
+     Panel visibility is no longer decided here. Since round 2 made client the
+     default, site.css hides the panel on html[data-view="client"], which
+     covers the plain URL as well as ?view=client. The .clean class stays for
+     ?clean=1, which hides the panel in dev view for screenshots. */
   const forced = params.get('view');
   if (forced === 'client' || forced === 'dev') {
     try{ localStorage.setItem(VIEW_KEY, forced); }catch(e){}

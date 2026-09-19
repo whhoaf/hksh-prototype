@@ -757,6 +757,13 @@ body{ padding-top:64px; }
   background:var(--raised-cream); border:1px solid var(--hairline); border-radius:var(--r-card);
   padding:14px; box-shadow:var(--shadow-float); display:flex; flex-direction:column; gap:12px;
 }
+/* The panel belongs to dev view only. Keying it on the view state rather than
+   on a query parameter matters since round 2 made client the default: a plain
+   URL opens in client view, and before this rule it still showed the panel
+   because nothing had added .clean. index.html carries data-view="client"
+   pre-boot, so the panel never flashes before initTweaksPanel runs. Dev view
+   is reachable at ?view=dev, which brings the panel back. */
+html[data-view="client"] .tweaks-panel{ display:none !important; }
 html.clean .tweaks-panel{ display:none !important; }
 .tweaks-title{ font-family:var(--f-display); font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--deep-navy); }
 .tweaks-row{ display:flex; flex-direction:column; gap:6px; }
