@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" data-view="dev">
+<!-- data-view: the pre-boot value only; shared.js initView() sets the real one
+     from ?view= or localStorage. Client is the default since 2026-09-19, so
+     this matches index.html and the change-request callouts do not flash
+     before boot. -->
+<html lang="en" data-view="client">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -73,10 +77,13 @@
 <div class="bk"><div class="wrap in">
   <div>
 
-    <!-- S1  venue: court picker -->
+    <!-- S1  venue: court picker. Round 2 item 12: the selected court card
+         grows a quantity stepper (rendered by booking.js into #courtList),
+         which is a BACKEND CHANGE REQUEST. -->
     <section class="screen" id="s1">
       <h1 data-str="bk.s1_h"></h1>
       <p class="sub" data-str="bk.s1_sub"></p>
+      <div class="cr"><b data-str="bk.cr_l"></b><span data-str="bk.cr_qty"></span></div>
       <div class="opts" id="courtList"></div>
     </section>
 
@@ -93,6 +100,9 @@
       <h1 data-str="bk.s5_h"></h1>
       <p class="sub" data-str="bk.s5_sub"></p>
       <div class="cr"><b data-str="bk.cr_l"></b><span data-str="bk.cr_coach"></span></div>
+      <!-- Round 2 item 10: specialty filter chips, filled by booking.js from
+           the tags already on each coach. Client-side only. -->
+      <div class="chips" id="coachFilters" role="group" data-str-aria="bk.filter_aria"></div>
       <div class="opts" id="coachList"></div>
     </section>
 
@@ -153,6 +163,13 @@
       <h1 data-str="bk.s8_h"></h1>
       <p class="sub" data-str="bk.s8_sub"></p>
       <div class="recap" id="recap"></div>
+      <!-- Round 2 item 11: add to calendar. Both hrefs are built by
+           booking.js from the booked date, time and duration. -->
+      <div class="cal-row">
+        <a class="btn btn-ghost" id="gcal" href="#" target="_blank" rel="noopener" data-str="bk.s8_gcal"></a>
+        <a class="callink" id="ics" href="#" download="sporting-hub-booking.ics" data-str="bk.s8_ics"></a>
+      </div>
+      <div class="cr"><b data-str="bk.cr_l"></b><span data-str="bk.cr_cal"></span></div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <a class="btn btn-primary" href="index.html" data-str="bk.s8_home"></a>
         <a class="btn btn-ghost" href="booking.html" data-str="bk.s8_again"></a>
@@ -174,7 +191,7 @@
 
 <!-- mobile bar -->
 <div class="bar" id="bar">
-  <div class="amt"><div class="l" data-str="bk.sum_total"></div><div class="v price-tbc" id="barTotal">HK$ TBC</div></div>
+  <div class="amt"><div class="l" data-str="bk.sum_total"></div><div class="v price-tbc" id="barTotal">HK$ TBC<span id="barQty"></span></div></div>
   <button class="btn btn-primary" id="barNext" data-str="bk.next"></button>
 </div>
 

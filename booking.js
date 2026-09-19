@@ -12,10 +12,16 @@
    pure state-machine plumbing or vector court-diagram assets, not text
    copy, so they do not move to strings.js.
    Mirrors the Bliss prototype's screen ids (s1/s2/s5/s6/s7/s8) because HKSH
-   books on the Bliss backend. Two steps are backend change requests and are
+   books on the Bliss backend. Four steps are backend change requests and are
    marked in the UI:
      s1c  category pre-select ahead of the standard flow
      s5   coach picked before the date
+     s1   quantity per court (round 2, client 2026-09-19)
+     s8   add to calendar on the Bliss-rendered confirmation (round 2)
+   Round 2 (client review 2026-09-19) added items 8 to 12: the Workshop
+   category, a coach line on class session cards, a coach specialty filter on
+   s5, add-to-calendar links on s8, and the court quantity stepper on s1.
+   Each one is marked "round 2" inline below; nothing else moved.
    Front end only. No network calls. Every price is a placeholder. */
 
 /* ---------- prices: one object, one edit when Suki's rate card lands ---------- */
@@ -40,8 +46,63 @@ const CLASSES = window.BOOKING_DATA.CLASSES;
 const COACHES = window.BOOKING_DATA.COACHES;
 const SIZES = window.BOOKING_DATA.SIZES;
 
+/* ---------- round 2 item 8: the Workshop category and its two sessions ----------
+   build_strings.py owns the court./cat./class./coach./size. key families and
+   is out of scope for this pass, so the fourth category and its two
+   placeholder sessions are appended here instead, read out of the same STR
+   table every other booking string comes from (bk. keys, both languages).
+   The shapes match BOOKING_DATA's own entries exactly (en/zh, d_en/d_zh,
+   coach, dur, spots), so renderCats, renderClasses, the chips, lines() and
+   the recap need no change to see them. Prices still render through the one
+   class call site in renderClasses, so both read HK$ TBC like every other
+   session (QA check 5 counts those call sites by regex, so this note must
+   not spell one out).
+   Coach roles are reused from COACHES, never invented: the client still owes
+   the real names. */
+const roleOf = id => (COACHES.find(c => c.id === id) || {n:''}).n;
+CATS.push({ id:'ws', en:STR.en.cat_ws, zh:STR.zh.cat_ws, d_en:STR.en.cat_ws_d, d_zh:STR.zh.cat_ws_d });
+CLASSES.push(
+  { id:'w1', cat:'ws', en:STR.en.class_w1, zh:STR.zh.class_w1, coach:roleOf('marco'),
+    dur:120, spots:12, d_en:STR.en.class_w1_d, d_zh:STR.zh.class_w1_d },
+  { id:'w2', cat:'ws', en:STR.en.class_w2, zh:STR.zh.class_w2, coach:roleOf('elaine'),
+    dur:90, spots:16, d_en:STR.en.class_w2_d, d_zh:STR.zh.class_w2_d }
+);
+
+/* ---------- round 2 item 10: distinct coach specialty tags ----------
+   Keyed on the English label, which is stable across a language switch, with
+   the Chinese label alongside so nm() renders the chip in either language
+   and S.ctag can stay language-neutral. No new strings: these are the tags
+   already on each coach. */
+const COACH_TAGS = (() => {
+  const m = new Map();
+  COACHES.forEach(c => c.tags_en.forEach((t,i) => { if(!m.has(t)) m.set(t, c.tags_zh[i]); }));
+  return Array.from(m, ([en,zh]) => ({en, zh}));
+})();
+
+/* ---------- round 2 item 9: one neutral avatar glyph ----------
+   Was inline in renderCoaches; lifted to a const so the new coach line on the
+   class session cards uses the same mark. */
+const AVATAR = `<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.6"/><path d="M5 19c1.2-3.6 4-5.4 7-5.4s5.8 1.8 7 5.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+const coachVal  = role => `${role}, ${T('coach_tbc')}`;
+const coachLine = role => `${T('l_coach')}: ${coachVal(role)}`;
+
+/* ---------- round 2 item 12: plus and minus marks for the court stepper ----------
+   Drawn, not typed, so no dash character of any kind enters the copy. */
+const MINUS = `<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7.2" width="10" height="1.6" rx="0.8" fill="currentColor"/></svg>`;
+const PLUS  = `<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7.2" width="10" height="1.6" rx="0.8" fill="currentColor"/><rect x="7.2" y="3" width="1.6" height="10" rx="0.8" fill="currentColor"/></svg>`;
+const MAX_COURTS = 2;   /* one hall holds two courts (client, 2026-09-19) */
+
+/* ---------- round 2 item 11: fixed details the calendar event quotes ---------- */
+const VENUE = 'Sporting Hub Hong Kong';   /* brand name, identical in both locales per strings.en.json's glossary */
+const REF = 'SHHK-2026-0001';             /* was inline in renderRecap */
+
 const TIMES = ["07:00","08:00","09:00","10:00","11:00","12:00","14:00","15:00",
                "16:00","17:00","18:00","19:00","20:00","21:00","22:00"];
+/* class session start times, one per card position. Lifted out of
+   renderClasses (round 2 item 11) so the calendar link can read back the time
+   the chosen card actually showed. */
+const CLASS_TIMES = ["09:00","12:30","18:00","19:30","20:30"];
+const CLS_TIME = {};
 /* deterministic "already booked" pattern, so the demo looks the same every load */
 const taken = (dayIdx, i) => ((dayIdx * 7 + i * 5) % 11) < 3;
 
@@ -58,7 +119,9 @@ const RAIL = {
   class: ["st_cat","st_session","st_you","st_pay"],
   pt:    ["st_coach","st_size","st_when","st_you","st_pay"]
 };
-const S = { i:0, court:null, cat:null, cls:null, coach:null, size:null, day:0, time:null, filters:[] };
+/* qty (round 2 item 12, courts per booking) and ctag (round 2 item 10, the
+   coach specialty filter) are the only additions to v1's state object. */
+const S = { i:0, court:null, cat:null, cls:null, coach:null, size:null, day:0, time:null, filters:[], qty:1, ctag:'' };
 
 if (qs.get("court") && COURTS.some(c=>c.id===qs.get("court"))) S.court = qs.get("court");
 if (qs.get("t")) S.time = qs.get("t");
@@ -93,14 +156,37 @@ function renderRail(){
   }).join('');
 }
 
+/* Round 2 item 12: the quantity stepper for the selected court. It renders as
+   the next item in the .opts grid rather than inside the card, because .opt
+   is a <button> and a button may not legally contain the two stepper
+   buttons; booking.css merges the two into one card (.opt.sel.has-qty +
+   .qty). Range 1 to MAX_COURTS, default 1, reset whenever the court changes. */
+function qtyHTML(){
+  return `
+    <div class="qty">
+      <span class="qty-l">${T('qty_l')}</span>
+      <span class="qty-ctl">
+        <button type="button" class="qty-b" data-q="-1" aria-label="${T('qty_less')}" ${S.qty<=1?'disabled':''}>${MINUS}</button>
+        <span class="qty-v" aria-live="polite">${S.qty}</span>
+        <button type="button" class="qty-b" data-q="1" aria-label="${T('qty_more')}" ${S.qty>=MAX_COURTS?'disabled':''}>${PLUS}</button>
+      </span>
+    </div>`;
+}
 function renderCourts(){
-  document.getElementById('courtList').innerHTML = COURTS.map(c=>`
-    <button class="opt ${S.court===c.id?'sel':''}" data-court="${c.id}">
+  document.getElementById('courtList').innerHTML = COURTS.map(c=>{
+    const sel = S.court===c.id;
+    return `
+    <button class="opt ${sel?'sel has-qty':''}" data-court="${c.id}">
       <span class="dia">${DIA[c.dia]}</span>
       <span class="txt"><span class="t">${nm(c)}</span>
-        <span class="d">${T('hall')} ${pick(c,'h').replace(/^Hall |館$/g,'')} · ${money(PRICES.court)} / ${L()==='zh'?'小時':'hour'}</span></span>
-    </button>`).join('');
-  bind('courtList','court',v=>{S.court=v;});
+        <span class="d">${T('hall')} ${pick(c,'h').replace(/^Hall |館$/g,'')} · ${money(PRICES.court)} / ${L()==='zh'?'小時':'hour'}${sel&&S.qty>1?' × '+S.qty:''}</span></span>
+    </button>${sel?qtyHTML():''}`;}).join('');
+  bind('courtList','court',v=>{ if(S.court!==v) S.qty=1; S.court=v; });
+  /* stepper clicks redraw this screen only, so the card keeps its place */
+  document.querySelectorAll('#courtList .qty-b').forEach(b=>b.onclick=()=>{
+    S.qty = Math.min(MAX_COURTS, Math.max(1, S.qty + Number(b.dataset.q)));
+    renderCourts(); sync();
+  });
 }
 function renderCats(){
   document.getElementById('catList').innerHTML = CATS.map(c=>`
@@ -110,9 +196,25 @@ function renderCats(){
   bind('catList','cat',v=>{S.cat=v; S.filters=[v];});
 }
 function renderCoaches(){
-  document.getElementById('coachList').innerHTML = COACHES.map(c=>`
+  /* Round 2 item 10: specialty filter chips above the list. "All" resets.
+     Filtering is client-side on the tags each coach already carries; if the
+     chosen coach falls outside the new filter the choice is cleared, so Next
+     never stays enabled for a card nobody can see. */
+  const cf = document.getElementById('coachFilters');
+  if(cf){
+    cf.innerHTML = `<button type="button" class="chip ${S.ctag?'':'on'}" data-t="">${T('filter_all')}</button>`
+      + COACH_TAGS.map(t=>`<button type="button" class="chip ${S.ctag===t.en?'on':''}" data-t="${t.en}">${nm(t)}</button>`).join('');
+    cf.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{
+      S.ctag = b.dataset.t;
+      const cur = COACHES.find(c=>c.id===S.coach);
+      if(cur && S.ctag && !cur.tags_en.includes(S.ctag)) S.coach = null;
+      renderCoaches(); sync();
+    });
+  }
+  const list = COACHES.filter(c => !S.ctag || c.tags_en.includes(S.ctag));
+  document.getElementById('coachList').innerHTML = list.map(c=>`
     <button class="opt ${S.coach===c.id?'sel':''}" data-coach="${c.id}">
-      <span class="av" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.6"/><path d="M5 19c1.2-3.6 4-5.4 7-5.4s5.8 1.8 7 5.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+      <span class="av" aria-hidden="true">${AVATAR}</span>
       <span class="txt"><span class="t">${c.n}</span><span class="d">${nm(c)}</span>
         <span class="d">${pick(c,'x')}</span>
         <span class="tags">${(L()==='zh'?c.tags_zh:c.tags_en).map(t=>`<span class="tag">${t}</span>`).join('')}</span></span>
@@ -144,11 +246,19 @@ function renderClasses(){
   document.getElementById('s3sub').textContent = D[S.day].full;
 
   const list = CLASSES.filter(c=>!S.filters.length || S.filters.includes(c.cat));
-  document.getElementById('classList').innerHTML = list.length ? list.map((c,i)=>`
+  /* round 2 item 11: remember the time each card shows, so the s8 calendar
+     link can use the session's real start rather than guessing it. */
+  list.forEach((c,i)=>{ CLS_TIME[c.id] = CLASS_TIMES[i%5]; });
+  /* round 2 item 9: the coach moves off the meta line onto a line of its own,
+     with the avatar glyph, because the client asked to see who is
+     responsible. The "name to confirm" half stays visible in client view,
+     same convention as HK$ TBC. */
+  document.getElementById('classList').innerHTML = list.length ? list.map(c=>`
     <button class="opt ${S.cls===c.id?'sel':''}" data-cls="${c.id}">
       <span class="txt"><span class="t">${nm(c)}</span>
-        <span class="d">${["09:00","12:30","18:00","19:30","20:30"][i%5]} · ${c.dur} ${T('mins')} · ${c.coach}</span>
+        <span class="d">${CLS_TIME[c.id]} · ${c.dur} ${T('mins')}</span>
         <span class="d">${pick(c,'d')}</span>
+        <span class="cl"><span class="cl-av" aria-hidden="true">${AVATAR}</span>${coachLine(c.coach)}</span>
         <span class="tags"><span class="tag">${c.spots} ${T('spots')}</span></span></span>
       <span class="p">${money(PRICES.class)}</span>
     </button>`).join('') : `<p class="meta">${L()==='zh'?'呢個篩選冇課堂。':'No classes match this filter.'}</p>`;
@@ -182,13 +292,18 @@ function lines(){
   const out=[], D=days();
   if(MODE==='venue'){
     const c=COURTS.find(x=>x.id===S.court);
-    out.push([T('l_court'), c?nm(c):null]);
+    /* round 2 item 12: the court count rides on the court line, so it reaches
+       the summary aside, the s7 block and the s8 recap in one place. */
+    out.push([T('l_court'), c?nm(c)+(S.qty>1?' × '+S.qty:''):null]);
     out.push([T('l_when'), S.time ? `${D[S.day].full}, ${S.time}` : null]);
   }
   if(MODE==='class'){
     const cat=CATS.find(x=>x.id===S.cat), cl=CLASSES.find(x=>x.id===S.cls);
     out.push([T('st_cat'), cat?nm(cat):null]);
     out.push([T('l_class'), cl?nm(cl):null]);
+    /* round 2 item 9: who is responsible, in the summary and the recap too.
+       .wrapv lets this one value wrap, since .li .v is nowrap by default. */
+    if(cl) out.push([T('l_coach'), `<span class="wrapv">${coachVal(cl.coach)}</span>`]);
     if(cl) out.push([T('l_dur'), `${cl.dur} ${T('mins')}`]);
     out.push([T('l_when'), S.cls ? D[S.day].full : null]);
   }
@@ -208,6 +323,10 @@ function lineHTML(){
 function renderSummary(){
   const html = lineHTML();
   document.getElementById('sumLines').innerHTML = html;
+  /* round 2 item 12: the sticky bar carries no line list, so the court count
+     rides on its total instead. */
+  const bq = document.getElementById('barQty');
+  if(bq) bq.textContent = (MODE==='venue' && S.court && S.qty>1) ? ' × ' + S.qty : '';
   const s7 = document.getElementById('s7lines');
   if(s7) s7.innerHTML = `<div class="summary" style="max-width:460px">${html}
     <div class="total"><span>${T('sum_total')}</span><span class="price-tbc" data-price="tbc">HK$ TBC</span></div>
@@ -237,7 +356,7 @@ function render(){
   if(id==='s5b') renderSizes();
   if(id==='s3')  renderClasses();
   if(id==='s2')  renderSlots();
-  if(id==='s8')  renderRecap();
+  if(id==='s8'){ renderRecap(); renderCal(); }   /* round 2 item 11 */
   renderSummary();
 
   const last = id==='s8';
@@ -275,7 +394,62 @@ function renderRecap(){
     : 'basketball'];
   document.getElementById('recap').innerHTML =
     `<div class="watermark">${art}</div>${lineHTML()}
-     <div class="li"><span class="k">${T('ref')}</span><span class="v">SHHK-2026-0001</span></div>`;
+     <div class="li"><span class="k">${T('ref')}</span><span class="v">${REF}</span></div>`;
+}
+
+/* ---------- round 2 item 11: add to calendar (s8) ----------
+   One event, two links: a Google Calendar TEMPLATE url opened in a new tab,
+   and the same event as a VCALENDAR on a data: url for Apple Calendar.
+   Times are local floating (no Z, no TZID), with ctz=Asia/Hong_Kong on the
+   Google link, per the round 2 brief. Durations: a venue slot is one hour, a
+   class is its own dur, PT is 60 minutes. The confirmation page is rendered
+   by the Bliss backend, so both links are a change request for Edward; the
+   .cr callout on s8 says so. */
+function dayDate(i){ const d = new Date(); d.setDate(d.getDate() + i); return d; }
+function stamp(d){
+  const p = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}T${p(d.getHours())}${p(d.getMinutes())}00`;
+}
+function calEvent(){
+  let title = '', time = S.time, mins = 60;
+  if(MODE==='venue'){
+    const c = COURTS.find(x=>x.id===S.court);
+    title = (c ? nm(c) : '') + (S.qty>1 ? ' × ' + S.qty : '');
+  }
+  if(MODE==='class'){
+    const cl = CLASSES.find(x=>x.id===S.cls);
+    title = cl ? nm(cl) : '';
+    time = CLS_TIME[S.cls] || CLASS_TIMES[0];
+    mins = cl ? cl.dur : 60;
+  }
+  if(MODE==='pt'){
+    const co = COACHES.find(x=>x.id===S.coach);
+    title = T('cal_pt') + (co ? ' · ' + co.n : '');
+  }
+  if(!time) return null;
+  const base = dayDate(S.day), hm = time.split(':').map(Number);
+  const start = new Date(base.getFullYear(), base.getMonth(), base.getDate(), hm[0], hm[1], 0);
+  const end = new Date(start.getTime() + mins * 60000);
+  return { title, start:stamp(start), end:stamp(end), details:`${T('ref')} ${REF} · ${VENUE}` };
+}
+function renderCal(){
+  const g = document.getElementById('gcal'), i = document.getElementById('ics');
+  if(!g || !i) return;
+  const e = calEvent(); if(!e) return;
+  g.href = 'https://calendar.google.com/calendar/render?action=TEMPLATE'
+    + '&text=' + encodeURIComponent(e.title)
+    + '&dates=' + e.start + '/' + e.end
+    + '&details=' + encodeURIComponent(e.details)
+    + '&location=' + encodeURIComponent(VENUE)
+    + '&ctz=' + encodeURIComponent('Asia/Hong_Kong');
+  const ics = [
+    'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Sporting Hub Hong Kong//Booking prototype//EN',
+    'CALSCALE:GREGORIAN','BEGIN:VEVENT','UID:' + REF + '@sportinghub.hk',
+    'DTSTAMP:' + e.start,'DTSTART:' + e.start,'DTEND:' + e.end,
+    'SUMMARY:' + e.title,'DESCRIPTION:' + e.details,'LOCATION:' + VENUE,
+    'END:VEVENT','END:VCALENDAR'
+  ].join('\r\n');
+  i.href = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics);
 }
 
 /* ---------- boot ---------- */

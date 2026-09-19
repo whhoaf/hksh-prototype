@@ -80,10 +80,17 @@ h1,h2,h3,h4{ margin:0; font-family:var(--f-display); color:var(--deep-navy); }
    words." Same inline SVG markup as the nav lockup, coloured via
    currentColor. Wrapped in an h1 with an aria-label so the page keeps a
    real h1; the SVG itself carries aria-hidden so the brand name is not
-   announced twice. viewBox is 157.51 x 40.43 (ratio .2567), so at the
-   600px desktop ceiling it renders about 154px tall. */
+   announced twice.
+
+   Round 2 (client review 2026-09-19): the hero block is now centred, so the
+   lockup centres in its column (margin-inline auto) instead of sitting
+   flush left. The HERO copy of the SVG also tightens the gap between the
+   script and "Hong Kong" (see g.lk-sub in index.html), which drops its
+   viewBox to 157.51 x 39.27 (ratio .2493) -- about 150px tall at the 600px
+   desktop ceiling. The NAV copy and assets/logo/*.svg keep the agency's
+   original 40.43 viewBox, untouched. */
 .hero-lockup{
-  display:block; color:var(--court-cream); width:min(420px, 86vw); line-height:0; margin:0 0 16px;
+  display:block; color:var(--court-cream); width:min(420px, 86vw); line-height:0; margin:0 auto 16px;
 }
 .hero-lockup svg{ width:100%; height:auto; display:block; }
 @media(min-width:760px){ .hero-lockup{ width:min(600px, 82vw); } }
@@ -181,12 +188,14 @@ h1,h2,h3,h4{ margin:0; font-family:var(--f-display); color:var(--deep-navy); }
   font-family:var(--f-body); font-size:11.5px; font-weight:600; line-height:1.3;
   color:var(--court-cream); background:rgba(17,37,72,.62); border-radius:var(--r-pill); padding:5px 11px; max-width:calc(100% - 24px);
 }
-/* Fix 2026-09-07 (defect 2): inside .arch containers, --r-arch's top
-   corners are full semicircles, so a pill 12px from the top-left gets
-   clipped by .arch's overflow:hidden. Bottom corners are only 24px, so
-   move the pill there instead; scoped to .arch only, non-arch photo-slots
-   are unaffected. */
-.arch .photo-slot{ top:auto; bottom:12px; }
+/* Was: inside .arch containers, --r-arch's top corners are full
+   semicircles, so a pill 12px from the top-left got clipped and had to
+   move to the bottom (fix 2026-09-07, defect 2). Round 2 replaced both
+   arches with 14px rectangles (.photo-rect), which clip nothing at the top
+   left, so the caption goes back to the default top-left position shared
+   with every other photo slot. The rule stays as a no-op guard against a
+   caption sitting on top of a corner radius. */
+.photo-rect .photo-slot{ top:12px; bottom:auto; }
 html[data-view="client"] .tbc,
 html[data-view="client"] .photo-slot{ display:none !important; }
 
@@ -235,17 +244,31 @@ html[data-view="client"] .dev-note{ display:none !important; }
    mobile, 62% desktop) so it starts well above the eyebrow, and the ramp is
    steep early so the eyebrow sits at about .5 and the lockup at .58 to .77
    (desktop) / .64 to .76 (mobile), measured by qa.py check 14. The photo's
-   upper 40% stays untouched. Tile scrims (.scrim-tile) are not changed. */
+   upper 40% stays untouched. Tile scrims (.scrim-tile) are not changed.
+
+   Round 2 (client review 2026-09-19, item 1): the hero block moved from
+   bottom-anchored to vertically and horizontally centred, so a band pinned
+   to the bottom no longer sits under the text at all. The scrim now spans
+   the whole frame (inset:0) with a gradient that stays near-clear across
+   the top quarter (the hall roof and skylight read through it), ramps hard
+   into a plateau across the middle where the eyebrow / lockup / lead /
+   pills sit, then eases off again at the bottom so the court floor is not
+   flattened. padding-top equal to the fixed nav's height keeps the block
+   optically centred in the area BELOW the nav rather than in the raw box.
+   Measured by qa.py check 14: alpha at the lockup's top edge stays above
+   the .5 floor Alfred set on 2026-09-09. */
 .hero-a .scrim{
-  inset:auto 0 0 0; height:66%;
+  inset:0; height:auto; justify-content:center; padding-top:64px;
   background:linear-gradient(180deg,
     rgba(17,37,72,0) 0%,
-    rgba(17,37,72,.30) 12%,
-    rgba(17,37,72,.60) 28%,
-    rgba(17,37,72,.76) 55%,
-    rgba(17,37,72,.86) 100%);
+    rgba(17,37,72,.08) 14%,
+    rgba(17,37,72,.46) 28%,
+    rgba(17,37,72,.66) 40%,
+    rgba(17,37,72,.66) 64%,
+    rgba(17,37,72,.48) 84%,
+    rgba(17,37,72,.30) 100%);
 }
-@media(min-width:1000px){ .hero-a .scrim{ height:62%; } }
+@media(min-width:1000px){ .hero-a .scrim{ padding-top:72px; } }
 /* Tile scrim (pillar / space / shop tiles): eixo pattern, confine the
    darkening to the caption band only so photos stay bright. Hard cap at 40%
    of the tile height; text content inside is sized to fit that band. */
@@ -261,7 +284,14 @@ html[data-view="client"] .dev-note{ display:none !important; }
 .tile-text{ padding:14px; width:100%; }
 @media(min-width:760px){ .tile-text{ padding:20px; } }
 
-.arch{ border-radius:var(--r-arch); overflow:hidden; position:relative; background:var(--cool-panel); }
+/* Round 2 (client review 2026-09-19, item 4): "No curve, bigger image" on
+   the brand-intro photo. Both arches (brand intro and corporate) become
+   plain rectangles at the --r-input 14px token. WITHDRAWS DESIGN.md
+   Graphic language's arch rule ("Signature photo shape... border-radius:
+   999px 999px 24px 24px... Use it on the one feature photo in a section:
+   the brand-intro portrait, the corporate-event photo") for this page:
+   the page now carries zero arches, so --r-arch is unused here. */
+.photo-rect{ border-radius:var(--r-input); overflow:hidden; position:relative; background:var(--cool-panel); }
 
 /* ============ court diagram ============ */
 .court-dia{ color:var(--court-cream); }
@@ -275,26 +305,61 @@ html[data-view="client"] .dev-note{ display:none !important; }
 }
 @media(min-width:1000px){ .nav{ height:72px; } }
 .nav .wrap{ display:flex; align-items:center; gap:20px; width:100%; }
+/* Round 2 (client review 2026-09-19, item 3): at 1200px the seven labels,
+   two dev tag pills, language toggle and Book pill could not share one row,
+   so four labels wrapped to two lines. The nav (chrome, not content) gets a
+   wider measure than DESIGN.md's 1200px content max-width from 1440px up;
+   below that the tag pills are dropped instead (see .nav-item-wrap .tbc). */
+@media(min-width:1440px){ .nav .wrap{ max-width:1400px; } }
+/* Between the desktop breakpoint and 1280px the row is at its tightest
+   (the wrap is still capped at 1200px and the seven labels, the toggle and
+   the Book pill all have to fit). One graded step down in label size, row
+   gap and Book-pill padding keeps every label on one line there instead of
+   letting flex shrink one label into its neighbour. */
+@media(min-width:1100px) and (max-width:1279px){
+  .nav .wrap{ gap:14px; }
+  .nav-items{ gap:13px; }
+  .nav-items a{ font-size:14.5px; }
+  .nav .book-pill{ padding:0 16px; font-size:14px; }
+}
 .nav-lockup{ width:150px; flex:none; color:var(--sideline-navy); display:flex; align-items:center; min-height:44px; }
 .nav-lockup svg{ width:100%; height:auto; display:block; }
 
-.nav-items{ display:none; gap:24px; align-items:center; }
-@media(min-width:1000px){ .nav-items{ display:flex; } }
+.nav-items{ display:none; gap:20px; align-items:center; flex:0 1 auto; }
+/* The inline item row appears at 1100px, not DESIGN.md's 1000px desktop
+   breakpoint. Round 2 (item 3) requires every label on one line; seven
+   English labels plus the language toggle and the Book pill measure about
+   36px wider than a 1000px viewport can hold even at 13.5px type, so
+   below 1100px the nav keeps the burger and the existing full-height
+   drawer, which carries the same seven items with room to spare. */
+@media(min-width:1100px){ .nav-items{ display:flex; } }
+/* white-space:nowrap + flex:none: DESIGN.md's Top nav is a single row of
+   items, and a label that breaks ("Our / Service") reads as two menu
+   entries. flex:none stops the row from shrinking a label into its
+   neighbour when the viewport is tight -- if it ever does not fit it
+   overflows visibly rather than overlapping silently (qa.py check 15). */
 .nav-items a{
-  font-family:var(--f-display); font-weight:600; font-size:17px; color:var(--sideline-navy);
+  font-family:var(--f-display); font-weight:600; font-size:16px; color:var(--sideline-navy);
   display:inline-flex; align-items:center; gap:5px; min-height:44px;
+  white-space:nowrap; flex:none;
 }
 .nav-items a .out{ width:12px; height:12px; opacity:.75; }
 /* Wraps a nav link that carries a dev-only .tbc pill (Shop, Media) so the
    link and its tag sit on one baseline without disturbing the other plain
    nav-items links. Hidden together with the .tbc pill in client view via
    the existing html[data-view="client"] .tbc rule (see Dev annotations). */
-.nav-item-wrap{ display:inline-flex; align-items:center; gap:6px; }
+.nav-item-wrap{ display:inline-flex; align-items:center; gap:6px; flex:none; }
 .nav-item-wrap .tbc{ font-size:11px; padding:2px 8px; }
+/* Round 2 (client review 2026-09-19, item 3): the two dev tag pills need
+   roughly 210px the nav does not have below 1440px, where they pushed
+   "Corporate Event" and "Contact Us" into their neighbours. Rendered only
+   where there is room; the same two facts stay tagged in the mobile drawer
+   (.drawer-item-wrap .tbc), which has a full-width column for them. */
+@media(max-width:1439px){ .nav-item-wrap .tbc{ display:none; } }
 
 .nav-right{ margin-left:auto; display:flex; align-items:center; gap:12px; }
 .nav-burger{ display:flex; width:44px; height:44px; align-items:center; justify-content:center; flex-direction:column; gap:4px; flex:none; }
-@media(min-width:1000px){ .nav-burger{ display:none; } }
+@media(min-width:1100px){ .nav-burger{ display:none; } }
 .nav-burger i{ width:20px; height:2px; background:var(--sideline-navy); display:block; font-style:normal; }
 .nav .book-pill{ background:var(--sideline-navy); color:var(--court-cream); height:44px; padding:0 20px; font-size:15px; }
 @media(min-width:760px){ .nav .book-pill{ height:44px; padding:0 22px; } }
@@ -314,18 +379,19 @@ html:not(.nav-scrolled) .page-home .nav .lang-toggle{ border-color:rgba(251,243,
 html:not(.nav-scrolled) .page-home .nav .lang-toggle button{ color:var(--court-cream); }
 html:not(.nav-scrolled) .page-home .nav .lang-toggle button[aria-pressed="true"]{ background:var(--court-cream); color:var(--sideline-navy); }
 
-/* nav lockup hides while the nav is transparent on the home page, per
-   DESIGN.md Hero: "Nav lockup hides while the nav is transparent on the
-   home page... and fades in when the nav goes solid after 80px of scroll.
-   One lockup on screen at a time." The hero's own headline is already the
-   lockup, so showing the nav's copy too would put two on screen at once.
-   aria-hidden is toggled in JS (initNavScroll) so screen readers do not
-   get the same link announced twice while it sits invisible. On every
-   other page (booking-s2.html has no .page-home) the lockup is unaffected
-   and stays visible from the top, per DESIGN.md: "On every other page the
-   nav is solid from the top and the lockup is always visible." */
-.page-home .nav .nav-lockup{ transition:opacity 200ms var(--ease); }
-html:not(.nav-scrolled) .page-home .nav .nav-lockup{ opacity:0; pointer-events:none; }
+/* Nav lockup: always visible, including on the home page over the hero.
+   WITHDRAWS DESIGN.md Hero's "Nav lockup hides while the nav is
+   transparent on the home page... One lockup on screen at a time."
+   Client review round 2 (2026-09-19, item 3) read the missing logo as a
+   bug: the top-left of the page was blank until you scrolled. Over the
+   photo the lockup renders in Court cream so it is legible on the render
+   and matches the nav items beside it; it crossfades to Sideline navy with
+   the rest of the nav once the nav goes solid after 80px of scroll. The
+   opacity transition is replaced by a colour transition (nothing fades in
+   or out any more), and initNavScroll no longer toggles aria-hidden on it,
+   since the link is now always exposed. */
+.page-home .nav .nav-lockup{ transition:color var(--dur) var(--ease); }
+html:not(.nav-scrolled) .page-home .nav .nav-lockup{ color:var(--court-cream); }
 
 /* ============ mobile drawer ============
    Per DESIGN.md Top nav: "Mobile collapses to lockup, language toggle,
@@ -357,7 +423,7 @@ html:not(.nav-scrolled) .page-home .nav .nav-lockup{ opacity:0; pointer-events:n
   min-width:44px; min-height:44px; margin-bottom:6px; display:flex; align-items:center; justify-content:center;
 }
 .drawer-book{ margin-top:16px; }
-@media(min-width:1000px){ .drawer,.drawer-scrim{ display:none; } }
+@media(min-width:1100px){ .drawer,.drawer-scrim{ display:none; } }
 
 /* ============ nav clearance ============ */
 /* nav is fixed; every page body clears it, except the home hero which pulls
@@ -430,9 +496,16 @@ body{ padding-top:64px; }
    photo slots, arch count, scrim rules, radii" that the brief freezes; a
    text-flush-to-the-edge legibility bug is fixed here, adding the gutter
    back via padding-left/right instead of clobbering it. */
-.hero-a .hero-text-block{ padding:28px var(--gut) 48px; max-width:1136px; }
-@media(min-width:760px){ .hero-a .hero-text-block{ padding:40px var(--gut) 64px; } }
-@media(min-width:1000px){ .hero-a .hero-text-block{ padding:56px var(--gut) 72px; } }
+/* Round 2 (client review 2026-09-19, item 1): centred, not bottom-left.
+   Vertical placement is the parent .hero-a .scrim's justify-content:center;
+   here the block only keeps its gutter and centres its own inline content.
+   The lead keeps DESIGN.md's 680px text-column cap so a centred paragraph
+   does not run the full 1136px. */
+.hero-a .hero-text-block{ padding:28px var(--gut); max-width:1136px; text-align:center; }
+@media(min-width:760px){ .hero-a .hero-text-block{ padding:40px var(--gut); } }
+@media(min-width:1000px){ .hero-a .hero-text-block{ padding:56px var(--gut); } }
+.hero-a .hero-text-block .lead{ max-width:var(--text-col); margin-left:auto; margin-right:auto; }
+.hero-a .hero-actions{ justify-content:center; }
 
 /* ============ pillars (section 2) ============ */
 #pillars{ scroll-margin-top:90px; }
@@ -483,12 +556,20 @@ body{ padding-top:64px; }
 
 /* ============ brand intro (section 3) ============ */
 .intro-grid{ display:grid; gap:32px; }
-.intro-photo{ order:-1; width:80%; margin:0 auto; }
+/* Round 2 (client review 2026-09-19, item 4): "bigger image". Mobile goes
+   from an 80%-wide 4:5 arch to a full-width 4:3 rectangle; desktop drops
+   the 400px cap so the frame fills its grid column, and from 1200px up
+   takes a fixed 560px height (the column is 520px there, so the frame is
+   both wider and taller than the old 400 x 500 arch, and clears the 520px
+   floor qa.py check 15 asserts). */
+.intro-photo{ order:-1; width:100%; margin:0; }
 @media(min-width:900px){
   .intro-grid{ grid-template-columns:minmax(0,560px) 1fr; align-items:center; gap:56px; }
-  .intro-photo{ order:2; width:100%; margin:0; justify-self:end; max-width:400px; }
+  .intro-photo{ order:2; width:100%; margin:0; justify-self:stretch; }
 }
-.intro-photo .arch{ aspect-ratio:4/5; }
+.intro-photo .photo-rect{ aspect-ratio:4/3; }
+@media(min-width:900px){ .intro-photo .photo-rect{ aspect-ratio:4/5; } }
+@media(min-width:1200px){ .intro-photo .photo-rect{ aspect-ratio:auto; height:560px; } }
 .intro-text{ max-width:560px; }
 
 /* ============ courts and spaces (section 4) ============ */
@@ -541,10 +622,20 @@ body{ padding-top:64px; }
      siblings. A fixed 3-column grid guarantees three equal columns. */
   .jp-coaches{ display:grid; grid-template-columns:repeat(3, 1fr); }
 }
+/* Round 2 (client review 2026-09-19, item 6): the third card's title
+   ("Volleyball coach") wraps to two lines, which pushed its Book pill 27px
+   below the other two. Column flex + margin-top:auto on the pill pins all
+   three buttons to the same bottom edge whatever the title does. */
 .coach-card{
   flex:0 0 250px; scroll-snap-align:start; background:var(--raised-cream); border:1px solid var(--hairline);
   border-radius:var(--r-card); padding:var(--card-pad);
+  display:flex; flex-direction:column; align-items:stretch;
 }
+/* the dev "name and bio to confirm" pill is an inline-flex span in normal
+   flow; as a stretched flex item it would run the full card width, so pin
+   it back to its own content width. */
+.coach-card > .tbc{ align-self:flex-start; }
+.coach-card > .btn{ margin-top:auto; }
 @media(min-width:1000px){ .coach-card{ flex:none; min-width:0; } }
 .coach-avatar{ width:60px; height:60px; border-radius:50%; background:var(--cool-panel); border:1px solid var(--hairline); margin-bottom:14px; }
 .coach-card .h-coach{ font-family:var(--f-display); font-weight:700; font-size:17px; color:var(--deep-navy); margin:0 0 6px; }
@@ -569,7 +660,7 @@ body{ padding-top:64px; }
 }
 @media(min-width:640px){ .corp-block{ grid-template-columns:180px 1fr; gap:26px; align-items:center; } }
 @media(min-width:900px){ .corp-block{ grid-template-columns:220px 1fr; } }
-.corp-block .arch{ aspect-ratio:4/5; }
+.corp-block .photo-rect{ aspect-ratio:4/5; }
 .corp-actions{ display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
 
 .shop-tile{ position:relative; border-radius:var(--r-tile); overflow:hidden; min-height:320px; }
@@ -585,8 +676,29 @@ body{ padding-top:64px; }
   content:""; position:absolute; inset:12px; border-radius:calc(var(--r-panel) - 4px);
   border:1.5px solid rgba(151,174,214,.35); pointer-events:none;
 }
-.book-band .watermark{ position:absolute; right:-30px; bottom:-24px; width:300px; height:auto; color:var(--court-line-blue); opacity:.08; pointer-events:none; }
-@media(min-width:760px){ .book-band .watermark{ width:380px; } }
+/* Round 2 (client review 2026-09-19, item 5): the court diagram was
+   invisible. WITHDRAWS DESIGN.md Book band / Dark panel's "Court diagram
+   watermark at 8 percent": at Court line blue .08 on Deep navy the drawing
+   read as nothing at all. It is now the Court cream token at .45, drawn
+   large (440px desktop) and fully inside the panel instead of bleeding off
+   the right and bottom edges, so it reads as the white outline drawing the
+   client asked for. The panel takes a min-height from 760px up so the
+   whole diagram fits beside the copy rather than behind it, and the copy
+   block centres against it; on phones the band is too narrow for that, so
+   the diagram is small, tucked into the bottom-right corner and held at a
+   lower alpha where the sport pills do sit over it. */
+.book-band .watermark{
+  position:absolute; right:14px; bottom:14px; width:170px; height:auto;
+  color:var(--court-cream); opacity:.4; pointer-events:none;
+}
+@media(min-width:760px){
+  .book-band{ min-height:400px; display:flex; align-items:center; }
+  .book-band .watermark{ right:24px; bottom:24px; width:320px; opacity:.42; }
+}
+@media(min-width:1000px){
+  .book-band{ min-height:488px; }
+  .book-band .watermark{ right:36px; bottom:36px; width:440px; opacity:.45; }
+}
 .book-band-inner{ position:relative; z-index:1; max-width:640px; }
 .book-band-sub{ font-size:16px; color:rgba(251,243,228,.82); margin:0 0 24px; }
 .book-band-sports{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:24px; }

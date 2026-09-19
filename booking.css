@@ -218,12 +218,16 @@ html[lang="zh-Hant"] .tag{ font-family:"Noto Sans TC",sans-serif; letter-spacing
 
 /* ============ filter chips ============ */
 .chips{ display:flex; gap:7px; flex-wrap:wrap; margin-bottom:16px; }
-/* .chip min-height stays 36px per the inventory ("already 36px min-height
-   in the source; preserve as is unless told otherwise"), not the 44px tap
-   rule applied elsewhere. */
+/* Round 2 (2026-09-19): min-height goes from the inventory's carried-over
+   36px to the design system's 44px minimum (DESIGN.md, Spacing and layout:
+   "Tap targets 44px minimum"). The inventory froze 36px for a reskin that
+   added no chips; round 2 adds a fourth category chip on s3 and a whole new
+   coach filter row on s5, and the round 2 brief restates the 44px rule for
+   every new tap target. One value for both rows beats a 36px row on one
+   screen and a 44px row on the next. */
 .chip{
   border:1px solid var(--hairline); background:transparent; border-radius:var(--r-pill); padding:7px 14px;
-  font:600 13.5px Figtree,"Noto Sans TC",sans-serif; color:var(--charcoal); cursor:pointer; min-height:36px;
+  font:600 13.5px Figtree,"Noto Sans TC",sans-serif; color:var(--charcoal); cursor:pointer; min-height:44px;
 }
 .chip:hover{ border-color:var(--sideline-navy); }
 .chip.on{ background:var(--sideline-navy); border-color:var(--sideline-navy); color:var(--court-cream); }
@@ -330,6 +334,68 @@ html[lang="zh-Hant"] .cr b{ font-family:"Noto Sans TC",sans-serif; letter-spacin
    Edward's team, not for Suki. Hidden alongside .tbc when the shared view key
    is 'client' (set by index.html's panel or ?view=client on either page). */
 html[data-view="client"] .cr{ display:none !important; }
+
+/* ============ round 2, client review 2026-09-19 ============
+   Five additions, all built from the same tokens and the same .opt / .chip /
+   .btn atoms already in this file. Nothing above this block changed except
+   .chip's min-height. */
+
+/* ---- item 12: court quantity stepper ----
+   .opt is a <button>, so the stepper cannot sit inside it (a button may not
+   contain buttons). It renders as the next item in the .opts grid and is
+   merged into the selected card instead: the 10px grid gap is cancelled, the
+   top border dropped, only the bottom corners rounded, and the same 5% navy
+   wash .opt.sel uses so the two read as one card. The card gives up its own
+   shadow while the stepper is attached, so the pair casts one shadow at the
+   bottom rather than a seam across the middle. */
+.opt.sel.has-qty{ border-bottom-left-radius:0; border-bottom-right-radius:0; box-shadow:none; }
+.qty{
+  margin-top:-10px; background:rgba(30,68,137,.05);
+  border:1.5px solid var(--sideline-navy); border-top:0;
+  border-radius:0 0 var(--r-card) var(--r-card); box-shadow:var(--shadow-float);
+  padding:10px 15px 12px; display:flex; align-items:center; gap:12px;
+}
+.qty-l{ font-family:var(--f-display); font-weight:600; font-size:14px; color:var(--deep-navy); }
+.qty-ctl{ margin-left:auto; display:flex; align-items:center; gap:6px; }
+.qty-b{
+  width:44px; height:44px; min-height:44px; flex:none; border-radius:var(--r-pill);
+  border:1px solid var(--hairline); background:var(--raised-cream); color:var(--sideline-navy);
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+  transition:border-color var(--dur) var(--ease);
+}
+.qty-b:hover:not(:disabled){ border-color:var(--sideline-navy); }
+.qty-b:disabled{ opacity:.4; cursor:not-allowed; }
+.qty-b svg{ width:16px; height:16px; }
+.qty-v{
+  font-family:var(--f-display); font-weight:700; font-size:17px; color:var(--deep-navy);
+  min-width:30px; text-align:center;
+}
+
+/* ---- item 9: coach line on the class session cards ----
+   Its own line under the description, not another .d: the client asked to see
+   who is responsible, so it reads as a person, with the same neutral avatar
+   glyph the coach cards use at a smaller size. */
+.opt .cl{
+  display:flex; align-items:flex-start; gap:7px; margin-top:7px;
+  font-size:13px; font-weight:500; color:var(--deep-navy);
+}
+.opt .cl-av{
+  width:22px; height:22px; border-radius:50%; flex:none; background:var(--cool-panel);
+  border:1px solid var(--hairline); color:var(--sideline-navy);
+  display:flex; align-items:center; justify-content:center;
+}
+.opt .cl-av svg{ width:13px; height:13px; }
+/* the coach value is the one summary value long enough to need two lines */
+.li .v .wrapv{ display:inline-block; white-space:normal; }
+
+/* ---- item 11: add to calendar row on s8 ---- */
+.cal-row{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:18px; }
+.callink{
+  display:inline-flex; align-items:center; min-height:44px; padding:0 2px;
+  font-family:var(--f-display); font-weight:600; font-size:15px; color:var(--sideline-navy);
+  border-bottom:1px solid transparent;
+}
+.callink:hover{ border-bottom-color:var(--sideline-navy); }
 
 /* ============ success screen ============ */
 .done-mark{ width:64px; height:64px; border-radius:50%; background:var(--ok); display:flex; align-items:center; justify-content:center; margin-bottom:18px; }

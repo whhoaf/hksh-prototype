@@ -100,7 +100,14 @@ function boot(after){
    client who had switched to Client on the landing page still saw every dev
    tag and the three "Backend change request" callouts on the booking screens.
    Both pages now read the same key here; ?view=client|dev on either URL sets
-   it. Client view hides .tbc, .photo-slot, .dev-note and .cr via CSS. */
+   it. Client view hides .tbc, .photo-slot, .dev-note and .cr via CSS.
+
+   Round 2 (client review 2026-09-19, item 8): the DEFAULT is now client, not
+   dev. A first-time visitor with nothing in localStorage and no query param
+   sees the presentable page; dev annotations are opt-in through ?view=dev or
+   the landing page's panel switch, and persist exactly as before. Nothing
+   else about the panel logic changes. booking.html inherits this unchanged,
+   since it calls the same boot() -> initView() and has no panel of its own. */
 function initView(){
   const KEY = 'shhk-mock-view';
   let v = null;
@@ -109,5 +116,5 @@ function initView(){
     if (forced === 'client' || forced === 'dev'){ localStorage.setItem(KEY, forced); }
     v = localStorage.getItem(KEY);
   }catch(e){}
-  document.documentElement.setAttribute('data-view', v === 'client' ? 'client' : 'dev');
+  document.documentElement.setAttribute('data-view', v === 'dev' ? 'dev' : 'client');
 }
