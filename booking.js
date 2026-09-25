@@ -348,7 +348,7 @@ function renderClasses(){
         <span class="cl"><span class="cl-av" aria-hidden="true">${AVATAR}</span>${coachLine(c.coach)}</span>
         <span class="tags"><span class="tag">${c.spots} ${T('spots')}</span></span></span>
       <span class="p">${money(PRICES.class)}</span>
-    </button>`).join('') : `<p class="meta">${L()==='zh'?'呢個篩選冇課堂。':'No classes match this filter.'}</p>`;
+    </button>`).join('') : `<p class="meta">${L()==='zh'?'此篩選沒有課堂。':'No classes match this filter.'}</p>`;
   bind('classList','cls',v=>{S.cls=v;});
 }
 /* Round 3: a booking of N hours picks N separate time slots. They do not have
