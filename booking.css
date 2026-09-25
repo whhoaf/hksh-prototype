@@ -1,4 +1,4 @@
-/* Sporting Hub Hong Kong — prototype v2 booking flow skin
+/* Sporting Hub Hong Kong, prototype v2 booking flow skin
    Source: v1 booking.html's own inline <style> block (lines 11-175 of
    html/prototype/booking.html), which held almost all of the booking flow's
    visual rules (.bk-head, .rail, .opt, .tag, .chip, .date, .slotgrid,
@@ -225,9 +225,15 @@ html[lang="zh-Hant"] .tag{ font-family:"Noto Sans TC",sans-serif; letter-spacing
    coach filter row on s5, and the round 2 brief restates the 44px rule for
    every new tap target. One value for both rows beats a 36px row on one
    screen and a 44px row on the next. */
+/* A flex item may shrink below its content width, and CJK has a break
+   opportunity between every character, so a Chinese chip collapsed to one
+   character per line (round 2 shipped this; found in round 4 QA). Keeping the
+   label on one line and refusing to shrink fixes both locales, and the row
+   already wraps. */
 .chip{
   border:1px solid var(--hairline); background:transparent; border-radius:var(--r-pill); padding:7px 14px;
   font:600 13.5px Figtree,"Noto Sans TC",sans-serif; color:var(--charcoal); cursor:pointer; min-height:44px;
+  white-space:nowrap; flex:0 0 auto;
 }
 .chip:hover{ border-color:var(--sideline-navy); }
 .chip.on{ background:var(--sideline-navy); border-color:var(--sideline-navy); color:var(--court-cream); }
@@ -275,6 +281,41 @@ input:focus,textarea:focus,select:focus{ border-color:var(--sideline-navy); }
 .check input{ margin-top:3px; width:17px; height:17px; flex:none; accent-color:var(--sideline-navy); }
 .warn{ color:var(--err); font-size:14px; font-weight:500; display:none; }
 .warn.on{ display:block; }
+
+/* ============ round 4: new controls ============ */
+/* N1: the sport filter row sits directly under the category chips, so it
+   reads as a second level of the same filter rather than a new section. */
+.chips-sport{ margin-top:-6px; }
+/* N2: heading above the weekday picker for term courses */
+.pick-h{
+  font:600 13.5px Figtree,"Noto Sans TC",sans-serif; color:var(--charcoal);
+  margin:0 0 8px; opacity:.75;
+}
+.chip:disabled{ opacity:.35; cursor:default; }
+.chip:disabled:hover{ border-color:var(--hairline); }
+
+/* N8: the words "terms and conditions" inside the waiver sentence are the
+   link. A <span role="button"> rather than a <button>, because a button is an
+   atomic inline-block: a long phrase would sit on its own line instead of
+   flowing inside the sentence. */
+.tc-open{
+  color:var(--sideline-navy); text-decoration:underline; text-underline-offset:2px;
+  cursor:pointer;
+}
+.tc-open:focus-visible{ outline:2px solid var(--sideline-navy); outline-offset:2px; }
+.check > span{ display:block; }
+.tc-panel{
+  position:fixed; inset:0; z-index:200; background:rgba(20,28,44,.46);
+  display:flex; align-items:center; justify-content:center; padding:20px;
+}
+.tc-panel[hidden]{ display:none; }
+.tc-card{
+  background:var(--raised-cream); border:1px solid var(--hairline);
+  border-radius:var(--r-card); padding:24px; max-width:460px; width:100%;
+  max-height:80vh; overflow:auto;
+}
+.tc-card h2{ font-size:20px; margin:0 0 12px; }
+.tc-card p{ font-size:14.5px; line-height:1.6; margin:0 0 18px; color:var(--charcoal); }
 
 /* ============ summary (desktop aside + s7 injected block) ============ */
 .summary{

@@ -45,52 +45,53 @@ const CATS = window.BOOKING_DATA.CATS;
 const CLASSES = window.BOOKING_DATA.CLASSES;
 const COACHES = window.BOOKING_DATA.COACHES;
 const SIZES = window.BOOKING_DATA.SIZES;
+/* round 4 N1/N9: bare sport names for the filter chips, keyed by court id
+   plus "sc" for strength and conditioning */
+const SPORTS = window.BOOKING_DATA.SPORTS || {};
+const sportName = id => {
+  const s = SPORTS[id];
+  if(s) return L()==='zh' ? s.zh : s.en;
+  const court = COURTS.find(c=>c.id===id);
+  return court ? nm(court) : id;
+};
 
-/* ---------- round 2 item 8: the Workshop category and its two sessions ----------
-   build_strings.py owns the court./cat./class./coach./size. key families and
-   is out of scope for this pass, so the fourth category and its two
-   placeholder sessions are appended here instead, read out of the same STR
-   table every other booking string comes from (bk. keys, both languages).
-   The shapes match BOOKING_DATA's own entries exactly (en/zh, d_en/d_zh,
-   coach, dur, spots), so renderCats, renderClasses, the chips, lines() and
-   the recap need no change to see them. Prices still render through the one
-   class call site in renderClasses, so both read HK$ TBC like every other
-   session (QA check 5 counts those call sites by regex, so this note must
-   not spell one out).
-   Coach roles are reused from COACHES, never invented: the client still owes
+/* ---------- round 4 item N1: the Workshop category now comes from the build ----------
+   Round 2 appended the fourth category and its two sessions here at runtime,
+   from bk. strings, because build_strings.py owned the cat./class. key
+   families and was out of scope for that pass. Round 4 folds them into
+   CATS_TEMPLATE / CLASSES_TEMPLATE, so there is one place that defines a
+   category rather than two. The keys were renamed, not re-translated: the
+   approved copy moved from bk.cat_ws to cat.ws.name and so on.
+   Coach roles still come from COACHES, never invented: the client still owes
    the real names. */
 const roleOf = id => (COACHES.find(c => c.id === id) || {n:''}).n;
-CATS.push({ id:'ws', en:STR.en.cat_ws, zh:STR.zh.cat_ws, d_en:STR.en.cat_ws_d, d_zh:STR.zh.cat_ws_d });
-CLASSES.push(
-  { id:'w1', cat:'ws', en:STR.en.class_w1, zh:STR.zh.class_w1, coach:roleOf('marco'),
-    dur:120, spots:12, d_en:STR.en.class_w1_d, d_zh:STR.zh.class_w1_d },
-  { id:'w2', cat:'ws', en:STR.en.class_w2, zh:STR.zh.class_w2, coach:roleOf('elaine'),
-    dur:90, spots:16, d_en:STR.en.class_w2_d, d_zh:STR.zh.class_w2_d }
-);
 
-/* ---------- round 2 item 10: distinct coach specialty tags ----------
-   Keyed on the English label, which is stable across a language switch, with
-   the Chinese label alongside so nm() renders the chip in either language
-   and S.ctag can stay language-neutral. No new strings: these are the tags
-   already on each coach. */
-const COACH_TAGS = (() => {
-  const m = new Map();
-  COACHES.forEach(c => c.tags_en.forEach((t,i) => { if(!m.has(t)) m.set(t, c.tags_zh[i]); }));
-  return Array.from(m, ([en,zh]) => ({en, zh}));
-})();
-
-/* ---------- round 2 item 9: one neutral avatar glyph ----------
-   Was inline in renderCoaches; lifted to a const so the new coach line on the
-   class session cards uses the same mark. */
+/* Round 2 item 9: one neutral avatar glyph. Was inline in renderCoaches;
+   lifted to a const so the coach line on the class session cards uses the
+   same mark.
+   (Round 2's COACH_TAGS specialty map was retired in round 4: the personal
+   training filter is by sport now, read straight off each coach's `sport`
+   field, so there is nothing to derive from the tag labels.) */
 const AVATAR = `<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.6"/><path d="M5 19c1.2-3.6 4-5.4 7-5.4s5.8 1.8 7 5.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`;
 const coachVal  = role => `${role}, ${T('coach_tbc')}`;
 const coachLine = role => `${T('l_coach')}: ${coachVal(role)}`;
 
-/* ---------- round 2 item 12: plus and minus marks for the court stepper ----------
-   Drawn, not typed, so no dash character of any kind enters the copy. */
+/* ---------- round 3/4: the stepper counts HOURS, not courts ----------
+   Round 2 read the client's sketched plus and minus boxes as a court
+   quantity capped at 2. Round 3 corrected it: the control is hours, and the
+   cap is per HKID, not per hall. Drawn, not typed, so no dash character of
+   any kind enters the copy. */
 const MINUS = `<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7.2" width="10" height="1.6" rx="0.8" fill="currentColor"/></svg>`;
 const PLUS  = `<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7.2" width="10" height="1.6" rx="0.8" fill="currentColor"/><rect x="7.2" y="3" width="1.6" height="10" rx="0.8" fill="currentColor"/></svg>`;
-const MAX_COURTS = 2;   /* one hall holds two courts (client, 2026-09-19) */
+const MAX_HOURS = 2;   /* max 2 hours per HKID's booking (client, 2026-09-19) */
+
+/* Round 4: three of the seven bookable sports have no court diagram. The
+   agency owes the art, so they get a neutral outline rather than an invented
+   approximation: Teqvoly is a Teqball table inside a hexagonal surround, not
+   a rectangle, so following the pattern of the other four would be visibly
+   wrong to anyone who plays it. */
+const DIA_TBC = `<svg viewBox="0 0 106.15 94.01" aria-hidden="true" focusable="false"><rect x="8" y="8" width="90.15" height="78.01" rx="3" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="5 4" opacity="0.55"/><line x1="53.07" y1="8" x2="53.07" y2="86.01" stroke="currentColor" stroke-width="1.2" stroke-dasharray="5 4" opacity="0.55"/></svg>`;
+const diaFor = c => (c && c.dia && DIA[c.dia]) ? DIA[c.dia] : DIA_TBC;
 
 /* ---------- round 2 item 11: fixed details the calendar event quotes ---------- */
 const VENUE = 'Sporting Hub Hong Kong';   /* brand name, identical in both locales per strings.en.json's glossary */
@@ -119,12 +120,17 @@ const RAIL = {
   class: ["st_cat","st_session","st_you","st_pay"],
   pt:    ["st_coach","st_size","st_when","st_you","st_pay"]
 };
-/* qty (round 2 item 12, courts per booking) and ctag (round 2 item 10, the
-   coach specialty filter) are the only additions to v1's state object. */
-const S = { i:0, court:null, cat:null, cls:null, coach:null, size:null, day:0, time:null, filters:[], qty:1, ctag:'' };
+/* hours (round 3, hours per booking), times (round 3, one slot per hour),
+   ctag (round 2, the coach specialty filter), sport (round 4 N1, the sport
+   filter on the session list) and dow (round 4 N2, the weekday picker for
+   term courses) are the additions to v1's state object. */
+const S = { i:0, court:null, cat:null, cls:null, coach:null, size:null, day:0,
+            times:[], filters:[], hours:1, ctag:'', sport:'', dow:null };
 
 if (qs.get("court") && COURTS.some(c=>c.id===qs.get("court"))) S.court = qs.get("court");
-if (qs.get("t")) S.time = qs.get("t");
+/* round 3: ?t= preselects a slot. TIMES is defined above, so an unknown value
+   is ignored rather than becoming a selection the grid cannot show. */
+if (qs.get("t") && TIMES.includes(qs.get("t"))) S.times = [qs.get("t")];
 
 const L  = () => lang();
 const T  = k => (STR[L()] || STR.en)[k];
@@ -156,19 +162,20 @@ function renderRail(){
   }).join('');
 }
 
-/* Round 2 item 12: the quantity stepper for the selected court. It renders as
-   the next item in the .opts grid rather than inside the card, because .opt
-   is a <button> and a button may not legally contain the two stepper
-   buttons; booking.css merges the two into one card (.opt.sel.has-qty +
-   .qty). Range 1 to MAX_COURTS, default 1, reset whenever the court changes. */
+/* Round 3: the hours stepper for the selected court. It renders as the next
+   item in the .opts grid rather than inside the card, because .opt is a
+   <button> and a button may not legally contain the two stepper buttons;
+   booking.css merges the two into one card (.opt.sel.has-qty + .qty).
+   Range 1 to MAX_HOURS, default 1, reset whenever the court changes.
+   Changing the hours trims any slots already picked beyond the new count. */
 function qtyHTML(){
   return `
     <div class="qty">
       <span class="qty-l">${T('qty_l')}</span>
       <span class="qty-ctl">
-        <button type="button" class="qty-b" data-q="-1" aria-label="${T('qty_less')}" ${S.qty<=1?'disabled':''}>${MINUS}</button>
-        <span class="qty-v" aria-live="polite">${S.qty}</span>
-        <button type="button" class="qty-b" data-q="1" aria-label="${T('qty_more')}" ${S.qty>=MAX_COURTS?'disabled':''}>${PLUS}</button>
+        <button type="button" class="qty-b" data-q="-1" aria-label="${T('qty_less')}" ${S.hours<=1?'disabled':''}>${MINUS}</button>
+        <span class="qty-v" aria-live="polite">${S.hours}</span>
+        <button type="button" class="qty-b" data-q="1" aria-label="${T('qty_more')}" ${S.hours>=MAX_HOURS?'disabled':''}>${PLUS}</button>
       </span>
     </div>`;
 }
@@ -177,14 +184,19 @@ function renderCourts(){
     const sel = S.court===c.id;
     return `
     <button class="opt ${sel?'sel has-qty':''}" data-court="${c.id}">
-      <span class="dia">${DIA[c.dia]}</span>
+      <span class="dia">${diaFor(c)}</span>
       <span class="txt"><span class="t">${nm(c)}</span>
-        <span class="d">${T('hall')} ${pick(c,'h').replace(/^Hall |館$/g,'')} · ${money(PRICES.court)} / ${L()==='zh'?'小時':'hour'}${sel&&S.qty>1?' × '+S.qty:''}</span></span>
+        <span class="d">${money(PRICES.court)} / ${L()==='zh'?'小時':'hour'}${sel&&S.hours>1?' × '+S.hours:''}</span></span>
     </button>${sel?qtyHTML():''}`;}).join('');
-  bind('courtList','court',v=>{ if(S.court!==v) S.qty=1; S.court=v; });
+  /* Switching from one court to a DIFFERENT one resets the hours and clears
+     any slots, since those were picked against the old court's availability.
+     Choosing a court for the first time (S.court still null) must not, or a
+     ?t= deep link would be wiped by the very first click. */
+  bind('courtList','court',v=>{ if(S.court && S.court!==v){ S.hours=1; S.times=[]; } S.court=v; });
   /* stepper clicks redraw this screen only, so the card keeps its place */
   document.querySelectorAll('#courtList .qty-b').forEach(b=>b.onclick=()=>{
-    S.qty = Math.min(MAX_COURTS, Math.max(1, S.qty + Number(b.dataset.q)));
+    S.hours = Math.min(MAX_HOURS, Math.max(1, S.hours + Number(b.dataset.q)));
+    if(S.times.length > S.hours) S.times = S.times.slice(0, S.hours);
     renderCourts(); sync();
   });
 }
@@ -196,22 +208,27 @@ function renderCats(){
   bind('catList','cat',v=>{S.cat=v; S.filters=[v];});
 }
 function renderCoaches(){
-  /* Round 2 item 10: specialty filter chips above the list. "All" resets.
-     Filtering is client-side on the tags each coach already carries; if the
-     chosen coach falls outside the new filter the choice is cleared, so Next
-     never stays enabled for a card nobody can see. */
+  /* Round 4 N9: the filter chips are SPORTS, not specialty tags. The client
+     overwrote All / Pickleball / Youth / Family with VOLLEYBALL, PICKLE BALL,
+     BADMINTON, S&C, TEQVOLY and a trailing "......". Coaches carry a sport
+     via their dia key, which is the court id; S&C has no court, so a coach
+     whose specialty tags mention strength is grouped under 'sc'.
+     Filtering stays client-side, and if the chosen coach falls outside the
+     new filter the choice is cleared, so Next never stays enabled for a card
+     nobody can see. */
   const cf = document.getElementById('coachFilters');
   if(cf){
+    const ids = [...new Set(COACHES.map(c=>c.sport).filter(Boolean))];
     cf.innerHTML = `<button type="button" class="chip ${S.ctag?'':'on'}" data-t="">${T('filter_all')}</button>`
-      + COACH_TAGS.map(t=>`<button type="button" class="chip ${S.ctag===t.en?'on':''}" data-t="${t.en}">${nm(t)}</button>`).join('');
+      + ids.map(id=>`<button type="button" class="chip ${S.ctag===id?'on':''}" data-t="${id}">${sportName(id)}</button>`).join('');
     cf.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{
       S.ctag = b.dataset.t;
       const cur = COACHES.find(c=>c.id===S.coach);
-      if(cur && S.ctag && !cur.tags_en.includes(S.ctag)) S.coach = null;
+      if(cur && S.ctag && cur.sport !== S.ctag) S.coach = null;
       renderCoaches(); sync();
     });
   }
-  const list = COACHES.filter(c => !S.ctag || c.tags_en.includes(S.ctag));
+  const list = COACHES.filter(c => !S.ctag || c.sport === S.ctag);
   document.getElementById('coachList').innerHTML = list.map(c=>`
     <button class="opt ${S.coach===c.id?'sel':''}" data-coach="${c.id}">
       <span class="av" aria-hidden="true">${AVATAR}</span>
@@ -229,6 +246,37 @@ function renderSizes(){
     </button>`).join('');
   bind('sizeList','size',v=>{S.size=v;});
 }
+/* Round 4 N2: the four categories are two different products. A term course
+   (sport classes, S&C) runs a fixed number of lessons on one weekday, so the
+   customer picks a WEEKDAY. A one-off event (certificate, workshop) happens
+   on a single date, so the date picker stays. kindOf() reads which model the
+   current filter selection implies; with a mixed or empty filter it falls
+   back to the date picker, which is the safer default because it never hides
+   a real date. */
+const DOW_KEYS = ['dow_sun','dow_mon','dow_tue','dow_wed','dow_thu','dow_fri','dow_sat'];
+function kindOf(){
+  const on = CATS.filter(c => !S.filters.length || S.filters.includes(c.id));
+  const kinds = new Set(on.map(c => c.kind));
+  return kinds.size === 1 ? [...kinds][0] : 'event';
+}
+/* Round 4 N4: a term course card shows its term range, weekday and lesson
+   count; a one-off event shows its date and full time range. */
+function classMeta(c){
+  const t = [];
+  if(c.lessons != null){
+    const dow = T(DOW_KEYS[c.weekday]);
+    t.push(`${T('l_term')}: ${c.term} (${dow})`);
+    t.push(`${c.start} · ${c.dur} ${T('mins')}`);
+    t.push(`${T('l_lessons')}: ${c.lessons}`);
+  } else {
+    const d = c.date ? new Date(c.date + 'T00:00:00') : null;
+    const ds = d ? d.toLocaleDateString(L()==='zh'?'zh-HK':'en-GB',
+                     {day:'numeric', month:L()==='zh'?'long':'short', year:'numeric'}) : '';
+    if(ds) t.push(ds);
+    t.push(c.end ? `${c.start} to ${c.end}` : `${c.start} · ${c.dur} ${T('mins')}`);
+  }
+  return t.map(x=>`<span class="d">${x}</span>`).join('');
+}
 function renderClasses(){
   const chips = document.getElementById('classChips');
   chips.innerHTML = CATS.map(c=>
@@ -236,19 +284,58 @@ function renderClasses(){
   chips.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{
     const v=b.dataset.f;
     S.filters = S.filters.includes(v) ? S.filters.filter(x=>x!==v) : S.filters.concat(v);
+    S.cls=null; S.dow=null;
     renderClasses(); sync();
   });
-  const D = days();
-  document.getElementById('dates3').innerHTML = D.map((d,i)=>
-    `<button class="date ${S.day===i?'on':''}" data-d="${i}"><span class="dw">${d.dw}</span><span class="dn">${d.dn}</span></button>`).join('');
-  document.getElementById('dates3').querySelectorAll('.date').forEach(b=>
-    b.onclick=()=>{S.day=+b.dataset.d; S.cls=null; renderClasses(); sync();});
-  document.getElementById('s3sub').textContent = D[S.day].full;
 
-  const list = CLASSES.filter(c=>!S.filters.length || S.filters.includes(c.cat));
+  /* Round 4 N1: a sport filter row under the category chips. The client drew
+     VOLLEYBALL, BADMINTON, BASKETBALL and an explicit "......", meaning the
+     list continues, so every sport that actually has a class is listed. */
+  const sf = document.getElementById('sportChips');
+  if(sf){
+    const ids = [...new Set(CLASSES.map(c=>c.sport).filter(Boolean))];
+    sf.innerHTML = `<button type="button" class="chip ${S.sport?'':'on'}" data-s="">${T('sport_all')}</button>`
+      + ids.map(id=>`<button type="button" class="chip ${S.sport===id?'on':''}" data-s="${id}">${sportName(id)}</button>`).join('');
+    sf.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{
+      S.sport = b.dataset.s; S.cls = null;
+      renderClasses(); sync();
+    });
+  }
+
+  const kind = kindOf();
+  const dateWrap = document.getElementById('dates3wrap');
+  const dowWrap = document.getElementById('dowWrap');
+  const D = days();
+  if(dateWrap) dateWrap.hidden = (kind === 'term');
+  if(dowWrap) dowWrap.hidden = (kind !== 'term');
+
+  if(kind === 'term' && dowWrap){
+    /* weekdays that at least one visible course actually meets on */
+    const avail = new Set(CLASSES.filter(c=>c.lessons!=null).map(c=>c.weekday));
+    document.getElementById('dow').innerHTML = DOW_KEYS.map((k,i)=>
+      `<button type="button" class="chip ${S.dow===i?'on':''}" data-w="${i}" ${avail.has(i)?'':'disabled'}>${T(k)}</button>`).join('');
+    document.getElementById('dow').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{
+      const w = +b.dataset.w;
+      S.dow = (S.dow===w) ? null : w;
+      S.cls = null;
+      renderClasses(); sync();
+    });
+    document.getElementById('s3sub').textContent = '';
+  } else {
+    document.getElementById('dates3').innerHTML = D.map((d,i)=>
+      `<button class="date ${S.day===i?'on':''}" data-d="${i}"><span class="dw">${d.dw}</span><span class="dn">${d.dn}</span></button>`).join('');
+    document.getElementById('dates3').querySelectorAll('.date').forEach(b=>
+      b.onclick=()=>{S.day=+b.dataset.d; S.cls=null; renderClasses(); sync();});
+    document.getElementById('s3sub').textContent = D[S.day].full;
+  }
+
+  const list = CLASSES.filter(c=>
+       (!S.filters.length || S.filters.includes(c.cat))
+    && (!S.sport || c.sport === S.sport)
+    && (kind !== 'term' || S.dow == null || c.weekday === S.dow));
   /* round 2 item 11: remember the time each card shows, so the s8 calendar
      link can use the session's real start rather than guessing it. */
-  list.forEach((c,i)=>{ CLS_TIME[c.id] = CLASS_TIMES[i%5]; });
+  list.forEach(c=>{ CLS_TIME[c.id] = c.start || CLASS_TIMES[0]; });
   /* round 2 item 9: the coach moves off the meta line onto a line of its own,
      with the avatar glyph, because the client asked to see who is
      responsible. The "name to confirm" half stays visible in client view,
@@ -256,7 +343,7 @@ function renderClasses(){
   document.getElementById('classList').innerHTML = list.length ? list.map(c=>`
     <button class="opt ${S.cls===c.id?'sel':''}" data-cls="${c.id}">
       <span class="txt"><span class="t">${nm(c)}</span>
-        <span class="d">${CLS_TIME[c.id]} · ${c.dur} ${T('mins')}</span>
+        ${classMeta(c)}
         <span class="d">${pick(c,'d')}</span>
         <span class="cl"><span class="cl-av" aria-hidden="true">${AVATAR}</span>${coachLine(c.coach)}</span>
         <span class="tags"><span class="tag">${c.spots} ${T('spots')}</span></span></span>
@@ -264,22 +351,37 @@ function renderClasses(){
     </button>`).join('') : `<p class="meta">${L()==='zh'?'呢個篩選冇課堂。':'No classes match this filter.'}</p>`;
   bind('classList','cls',v=>{S.cls=v;});
 }
+/* Round 3: a booking of N hours picks N separate time slots. They do not have
+   to run back to back, so this is a multi-select capped at S.hours rather
+   than a range picker. Venue mode only: personal training still books one
+   slot, so needed() is 1 there. */
+function needed(){ return MODE==='venue' ? S.hours : 1; }
 function renderSlots(){
   const D = days();
   document.getElementById('dates2').innerHTML = D.map((d,i)=>
     `<button class="date ${S.day===i?'on':''}" data-d="${i}"><span class="dw">${d.dw}</span><span class="dn">${d.dn}</span></button>`).join('');
   document.getElementById('dates2').querySelectorAll('.date').forEach(b=>
-    b.onclick=()=>{S.day=+b.dataset.d; S.time=null; renderSlots(); sync();});
+    b.onclick=()=>{S.day=+b.dataset.d; S.times=[]; renderSlots(); sync();});
   const who = MODE==='pt'
     ? (COACHES.find(c=>c.id===S.coach)||{n:''}).n
     : nm(COURTS.find(c=>c.id===S.court)||{en:'',zh:''});
   document.getElementById('s2sub').textContent = who + ' · ' + D[S.day].full;
+  const need = needed(), got = S.times.length;
   document.getElementById('slots').innerHTML = TIMES.map((t,i)=>{
     const gone = taken(S.day,i);
-    return `<button class="tslot ${S.time===t?'on':''}" data-t="${t}" ${gone?'disabled':''}>${t}</button>`;
+    const on = S.times.includes(t);
+    /* once the quota is filled the remaining free slots are disabled, so the
+       count can never exceed the hours booked */
+    const full = !on && got >= need;
+    return `<button class="tslot ${on?'on':''}" data-t="${t}" ${gone||full?'disabled':''}>${t}</button>`;
   }).join('');
   document.getElementById('slots').querySelectorAll('.tslot').forEach(b=>
-    b.onclick=()=>{S.time=b.dataset.t; renderSlots(); sync();});
+    b.onclick=()=>{
+      const t = b.dataset.t;
+      if(S.times.includes(t)) S.times = S.times.filter(x=>x!==t);
+      else if(S.times.length < needed()) S.times = S.times.concat(t).sort();
+      renderSlots(); sync();
+    });
 }
 function bind(id, key, fn){
   document.getElementById(id).querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
@@ -288,30 +390,48 @@ function bind(id, key, fn){
 }
 
 /* ---------- summary ---------- */
+/* Round 3: several slots read as one value, e.g. "Tuesday 4 Nov, 08:00 and
+   10:00". Joined with the locale's own conjunction so no dash or slash
+   enters the copy. */
+function whenText(){
+  const D = days();
+  if(!S.times.length) return null;
+  const sep = L()==='zh' ? '、' : ', ';
+  return `${D[S.day].full}, ${S.times.join(sep)}`;
+}
 function lines(){
   const out=[], D=days();
   if(MODE==='venue'){
     const c=COURTS.find(x=>x.id===S.court);
-    /* round 2 item 12: the court count rides on the court line, so it reaches
-       the summary aside, the s7 block and the s8 recap in one place. */
-    out.push([T('l_court'), c?nm(c)+(S.qty>1?' × '+S.qty:''):null]);
-    out.push([T('l_when'), S.time ? `${D[S.day].full}, ${S.time}` : null]);
+    out.push([T('l_court'), c?nm(c):null]);
+    /* round 3: hours booked rides its own line, so it reaches the summary
+       aside, the s7 block and the s8 recap in one place */
+    out.push([T('qty_l'), S.court ? String(S.hours) : null]);
+    out.push([T('l_when'), whenText()]);
   }
   if(MODE==='class'){
-    const cat=CATS.find(x=>x.id===S.cat), cl=CLASSES.find(x=>x.id===S.cls);
+    const cat=bookedCat(), cl=CLASSES.find(x=>x.id===S.cls);
     out.push([T('st_cat'), cat?nm(cat):null]);
     out.push([T('l_class'), cl?nm(cl):null]);
     /* round 2 item 9: who is responsible, in the summary and the recap too.
        .wrapv lets this one value wrap, since .li .v is nowrap by default. */
     if(cl) out.push([T('l_coach'), `<span class="wrapv">${coachVal(cl.coach)}</span>`]);
     if(cl) out.push([T('l_dur'), `${cl.dur} ${T('mins')}`]);
-    out.push([T('l_when'), S.cls ? D[S.day].full : null]);
+    /* round 4 N4: a term course is described by its term, weekday and lesson
+       count; a one-off event by its date. */
+    if(cl && cl.lessons != null){
+      out.push([T('l_term'), `${cl.term} (${T(DOW_KEYS[cl.weekday])})`]);
+      out.push([T('l_lessons'), String(cl.lessons)]);
+    } else {
+      out.push([T('l_when'), S.cls ? D[S.day].full : null]);
+    }
   }
   if(MODE==='pt'){
     const co=COACHES.find(x=>x.id===S.coach), sz=SIZES.find(x=>x.id===S.size);
     out.push([T('l_coach'), co?co.n:null]);
-    out.push([T('l_size'), sz?nm(sz):null]);
-    out.push([T('l_when'), S.time ? `${D[S.day].full}, ${S.time}` : null]);
+    /* round 4 N10: group size became a coaching ratio */
+    out.push([T('l_ratio'), sz?nm(sz):null]);
+    out.push([T('l_when'), whenText()]);
   }
   return out;
 }
@@ -323,17 +443,48 @@ function lineHTML(){
 function renderSummary(){
   const html = lineHTML();
   document.getElementById('sumLines').innerHTML = html;
-  /* round 2 item 12: the sticky bar carries no line list, so the court count
-     rides on its total instead. */
+  /* round 3: the sticky bar carries no line list, so the hours ride on its
+     total instead. */
   const bq = document.getElementById('barQty');
-  if(bq) bq.textContent = (MODE==='venue' && S.court && S.qty>1) ? ' × ' + S.qty : '';
+  if(bq) bq.textContent = (MODE==='venue' && S.court && S.hours>1) ? ' × ' + S.hours : '';
   const s7 = document.getElementById('s7lines');
-  if(s7) s7.innerHTML = `<div class="summary" style="max-width:460px">${html}
+  /* Round 4 N11: personal training itemises coaching and court hire as
+     separate lines before the total, because the client's receipt does.
+     Both read HK$ TBC until the rate card lands, like every other price. */
+  const split = MODE==='pt'
+    ? `<div class="li"><span class="k">${T('l_coaching')}</span><span class="v">${money(PRICES.pt)}</span></div>
+       <div class="li"><span class="k">${T('l_courtfee')}</span><span class="v">${money(PRICES.court)}</span></div>`
+    : '';
+  if(s7) s7.innerHTML = `<div class="summary" style="max-width:460px">${html}${split}
     <div class="total"><span>${T('sum_total')}</span><span class="price-tbc" data-price="tbc">HK$ TBC</span></div>
     <p class="policy">${T('policy')}</p></div>`;
 }
 
 /* ---------- flow control ---------- */
+/* Round 4 N7: the details form differs per category. Workshop and
+   certificate courses ask a fuller set (date of birth, gender, how did you
+   hear about us); venue, personal training and training classes ask the
+   short set. Training classes should follow EVA's member registration
+   exactly (client, 2026-09-24), but nobody has supplied EVA's field list, so
+   they keep the short set and carry a change-request callout rather than an
+   invented form.
+   The category is read off the CHOSEN CLASS, not S.cat: S.cat records the
+   pre-select on s1c, but the session list lets the customer filter to a
+   different category and book from it, so the class is the truth. */
+function bookedCat(){
+  const cl = CLASSES.find(c => c.id === S.cls);
+  if(cl) return CATS.find(c => c.id === cl.cat) || null;
+  return CATS.find(c => c.id === S.cat) || null;
+}
+function formKind(){
+  if(MODE !== 'class') return 'short';
+  const cat = bookedCat();
+  return (cat && cat.kind === 'event') ? 'full' : 'short';
+}
+function requiredFields(){
+  const base = ['fFirst','fLast','fHkid','fEmail','fPhone'];
+  return formKind()==='full' ? base.concat('fDob','fGender','fHear') : base;
+}
 function canAdvance(){
   const id = FLOWS[MODE][S.i];
   if(id==='s1')  return !!S.court;
@@ -341,11 +492,76 @@ function canAdvance(){
   if(id==='s5')  return !!S.coach;
   if(id==='s5b') return !!S.size;
   if(id==='s3')  return !!S.cls;
-  if(id==='s2')  return !!S.time;
-  if(id==='s6')  return ['fFirst','fLast','fEmail','fPhone'].every(i=>document.getElementById(i).value.trim())
+  /* round 3: a booking of N hours needs N slots picked, not just one */
+  if(id==='s2')  return S.times.length === needed();
+  if(id==='s6')  return requiredFields().every(i=>{
+                       const el = document.getElementById(i);
+                       return !el || el.closest('[hidden]') ? true : el.value.trim();
+                     })
                      && document.getElementById('cWaiver').checked;
   return true;
 }
+/* Round 4 N7/N8: show the fields this category actually asks for, point the
+   terms link at the right body of terms, and surface the EVA change request
+   on training classes. */
+function renderForm(){
+  const full = formKind()==='full';
+  const ex = document.getElementById('s6extra');
+  if(ex) ex.hidden = !full;
+  /* the notes field survives on workshop and certificate only: the client
+     said LCSD does not ask it for court hire (round 3), then listed it for
+     workshops and certificates (round 4) */
+  const notes = document.getElementById('fNotesRow');
+  if(notes) notes.hidden = !full;
+  const eva = document.getElementById('crEva');
+  if(eva) eva.hidden = !(MODE==='class' && !full);
+
+  /* Round 3 A6 / round 4 N8: make the words "terms and conditions" inside the
+     waiver sentence clickable, in whichever position that phrase occupies in
+     the current language. Built here rather than in the markup because both
+     halves are translated strings: appending a second copy of the phrase
+     after the sentence would print it twice. */
+  const wt = document.getElementById('waiverText');
+  if(wt){
+    const sentence = T('c_waiv'), phrase = T('tc_link');
+    const at = sentence.indexOf(phrase);
+    const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    wt.innerHTML = at === -1
+      ? `${esc(sentence)} <span class="tc-open" id="tcOpen" role="button" tabindex="0">${esc(phrase)}</span>`
+      : esc(sentence.slice(0, at))
+        + `<span class="tc-open" id="tcOpen" role="button" tabindex="0">${esc(phrase)}</span>`
+        + esc(sentence.slice(at + phrase.length));
+    const btn = document.getElementById('tcOpen');
+    if(btn){
+      /* a span, not a button: a button is an atomic inline-block, so a long
+         phrase would sit on its own line instead of flowing inside the
+         sentence. role and keyboard handling are restored by hand. */
+      btn.onclick = e => { e.preventDefault(); e.stopPropagation(); openTerms(); };
+      btn.onkeydown = e => {
+        if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); e.stopPropagation(); openTerms(); }
+      };
+    }
+  }
+}
+/* which set of terms this booking falls under */
+function tcKey(){
+  if(MODE==='venue') return 'venue';
+  if(MODE==='pt') return 'pt';
+  const cat = bookedCat();
+  return cat ? cat.id : 'venue';
+}
+function openTerms(){
+  const dlg = document.getElementById('tcPanel');
+  if(!dlg) return;
+  document.getElementById('tcTitle').textContent = T('tc_h_' + tcKey());
+  document.getElementById('tcText').textContent = T('tc_pending');
+  dlg.hidden = false;
+}
+function closeTerms(){
+  const dlg = document.getElementById('tcPanel');
+  if(dlg) dlg.hidden = true;
+}
+
 function render(){
   const flow = FLOWS[MODE], id = flow[S.i];
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.id===id));
@@ -356,6 +572,7 @@ function render(){
   if(id==='s5b') renderSizes();
   if(id==='s3')  renderClasses();
   if(id==='s2')  renderSlots();
+  if(id==='s6')  renderForm();      /* round 4 N7 */
   if(id==='s8'){ renderRecap(); renderCal(); }   /* round 2 item 11 */
   renderSummary();
 
@@ -389,9 +606,9 @@ function prev(){
   if(S.i>0){ S.i--; render(); } else { location.href='index.html'; }
 }
 function renderRecap(){
-  const art = DIA[MODE==='venue'
-    ? (COURTS.find(c=>c.id===S.court)||{dia:'volleyball'}).dia
-    : 'basketball'];
+  const art = MODE==='venue'
+    ? diaFor(COURTS.find(c=>c.id===S.court))
+    : DIA['basketball'];
   document.getElementById('recap').innerHTML =
     `<div class="watermark">${art}</div>${lineHTML()}
      <div class="li"><span class="k">${T('ref')}</span><span class="v">${REF}</span></div>`;
@@ -411,15 +628,15 @@ function stamp(d){
   return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}T${p(d.getHours())}${p(d.getMinutes())}00`;
 }
 function calEvent(){
-  let title = '', time = S.time, mins = 60;
+  let title = '', time = S.times[0], mins = 60;
   if(MODE==='venue'){
     const c = COURTS.find(x=>x.id===S.court);
-    title = (c ? nm(c) : '') + (S.qty>1 ? ' × ' + S.qty : '');
+    title = c ? nm(c) : '';
   }
   if(MODE==='class'){
     const cl = CLASSES.find(x=>x.id===S.cls);
     title = cl ? nm(cl) : '';
-    time = CLS_TIME[S.cls] || CLASS_TIMES[0];
+    time = CLS_TIME[S.cls] || (cl && cl.start) || CLASS_TIMES[0];
     mins = cl ? cl.dur : 60;
   }
   if(MODE==='pt'){
@@ -470,8 +687,17 @@ if (document.getElementById('back')) {
   document.getElementById('back').onclick = prev;
   document.getElementById('sumNext').onclick = next;
   document.getElementById('barNext').onclick = next;
-  ['fFirst','fLast','fEmail','fPhone','cWaiver'].forEach(i=>{
+  /* round 4 N7: the extra workshop and certificate fields validate too */
+  ['fFirst','fLast','fHkid','fEmail','fPhone','fDob','fGender','fHear','cWaiver'].forEach(i=>{
     const el=document.getElementById(i); if(el) el.addEventListener('input', sync);
   });
+  /* round 4 N8 + round 3 A6: the terms panel. The open button is built by
+     renderForm (the link sits inside a translated sentence), so only the
+     panel's own dismiss handlers are wired here. */
+  const tcClose = document.getElementById('tcClose');
+  if(tcClose) tcClose.onclick = closeTerms;
+  const tcPanel = document.getElementById('tcPanel');
+  if(tcPanel) tcPanel.addEventListener('click', e => { if(e.target === tcPanel) closeTerms(); });
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') closeTerms(); });
   boot(pageExtras);
 }
