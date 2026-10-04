@@ -778,3 +778,144 @@ html.clean .tweaks-panel{ display:none !important; }
 /* ============ responsive overflow guards ============ */
 .pillars-grid > *,.spaces-grid > *,.intro-grid > *,.jp-grid > *,.corp-shop-grid > *,
 .find-grid > *,.footer-grid > *,.corp-block > *{ min-width:0; }
+
+/* ============ round 5 (2026-10-03): landing page ships before booking ============ */
+
+/* Top menu "beige/cream font hard to read" (2026-09-25 call). Before scroll
+   the nav is transparent, and its cream labels sat on the brightest part of
+   the hero photo (the hall ceiling) under a wash that was .45 at the very
+   top and close to clear by label height. The hero's top wash is now a
+   fixed 220px band holding .62 or more behind the whole nav row. */
+.hero-a .scrim-top{ height:220px; background:var(--scrim-nav); }
+html:not(.nav-scrolled) .page-home .nav .nav-items a{ text-shadow:0 1px 2px rgba(17,37,72,.45); }
+
+/* Main site (index.html, data-booking="open") versus the coming-soon page
+   (coming-soon.html, data-booking="soon"), see shared.js wireBooking().
+   No attribute reads as the main site. The coming-soon page drops what
+   only makes sense once booking is live: the coach cards (role names,
+   HK$ TBC, Book buttons) and the HK$ TBC "from" lines on the tiles. */
+.soon-note{ font-family:var(--f-body); font-weight:500; font-size:15px; line-height:1.5; color:var(--charcoal); margin:16px 0 0; text-wrap:balance; }
+.soon-note.on-photo{ color:rgba(251,243,228,.9); }
+html:not([data-booking="soon"]) .soon-only,
+html[data-booking="soon"] .open-only,
+html[data-booking="soon"] .jp-coaches,
+html[data-booking="soon"] .tile-price.price-tbc{ display:none !important; }
+
+
+/* Prices, per DESIGN.md "Price table": Barlow Condensed uppercase headers,
+   Figtree body, rows separated by Hairline, no zebra striping, inside an
+   --r-card container. Figures stay in Latin numerals in both locales. */
+.prices-lead{ margin:0 0 24px; }
+.price-grid{ display:grid; gap:20px; }
+@media(min-width:1000px){ .price-grid{ grid-template-columns:minmax(0,1.5fr) minmax(0,1fr); gap:28px; align-items:start; } }
+.price-card{ background:var(--raised-cream); border:1px solid var(--hairline); border-radius:var(--r-card); padding:6px var(--card-pad) 20px; }
+@media(min-width:760px){ .price-card{ padding:10px 28px 24px; } }
+.price-table{ width:100%; border-collapse:collapse; font-family:var(--f-body); }
+.price-table thead th{
+  font-family:var(--f-garnish); font-weight:700; font-size:15px; text-transform:uppercase; letter-spacing:.08em;
+  color:var(--sideline-navy); text-align:right; padding:14px 0 10px 16px; border-bottom:1px solid var(--hairline);
+}
+.price-table thead th:first-child{ text-align:left; padding-left:0; }
+.price-table tbody th,.price-table td{ padding:13px 0; border-bottom:1px solid var(--hairline); vertical-align:middle; }
+.price-table tbody tr:last-child th,.price-table tbody tr:last-child td{ border-bottom:0; }
+.price-table tbody th{ text-align:left; font-weight:400; }
+.price-table td{
+  text-align:right; padding-left:16px; white-space:nowrap; font-variant-numeric:tabular-nums;
+  font-family:var(--f-body); font-weight:600; font-size:17px; color:var(--deep-navy);
+}
+.rate-sport{ display:block; font-family:var(--f-display); font-weight:600; font-size:17px; line-height:1.25; color:var(--deep-navy); }
+.rate-court{ display:block; font-size:14px; font-weight:500; color:var(--meta-grey); margin-top:2px; }
+.price-hours{ font-size:var(--fs-meta); line-height:1.55; color:var(--charcoal); margin:14px 0 0; max-width:var(--text-col); }
+.price-notes{ display:grid; gap:12px; }
+.price-note{ background:var(--raised-cream); border:1px solid var(--hairline); border-radius:var(--r-card); padding:var(--card-pad); }
+@media(min-width:760px){ .price-note{ padding:22px 24px; } }
+.price-note .body-text{ margin:0; font-size:16px; }
+.price-note > .tbc{ margin-top:10px; }
+.h-note{ font-family:var(--f-display); font-weight:700; font-size:19px; line-height:1.2; color:var(--deep-navy); margin:0 0 6px; }
+.price-figure{ font-family:var(--f-display); font-weight:700; font-size:28px; line-height:1.1; color:var(--sideline-navy); margin:2px 0 6px; }
+.price-actions{ display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-top:12px; }
+.price-notes > .soon-note{ margin-top:0; }
+.price-actions [hidden]{ display:none !important; }
+
+/* Visual QA 2026-10-03. The opens-soon line and the peak-hours note carry
+   real information, so they take Charcoal rather than Meta grey, which sits
+   just under 4.5:1 on cream at these sizes. text-wrap:balance stops "now."
+   orphaning on phones. */
+
+/* Phones: seven sport buttons wrapped 2/2/2/1 with Badminton alone. Two
+   even columns, the odd last button spans both. The court drawing sat on
+   top of the last button and the Personal training link; the band now
+   reserves room for it below the content, and the content keeps clear of
+   the inset court line. */
+@media(max-width:759px){
+  .book-band{ padding:36px 28px 204px; }
+  /* lift the drawing off the inset court line it used to sit on */
+  .book-band .watermark{ right:28px; bottom:28px; }
+  .book-band-sports{ display:grid; grid-template-columns:1fr 1fr; }
+  .book-band-sports > :last-child:nth-child(odd){ grid-column:1 / -1; }
+  .book-band-sports .btn{ width:100%; padding:0 12px; }
+}
+
+/* Chinese hero line: "匹克 / 球" split across lines at 390px. keep-all
+   breaks only at the ideographic commas, so each sport name stays whole;
+   anywhere still lets a too-long run wrap rather than overflow. */
+html[lang="zh-Hant"] .hero-a .hero-text-block .lead{ word-break:keep-all; overflow-wrap:anywhere; }
+
+/* Visual QA 2026-10-04, third pass. On the coming-soon page the coach cards
+   are hidden, which left 58 percent of the Just Performance panel empty at
+   desktop. The jp-wide slot (DESIGN.md Photo slot spec) fills that column
+   there instead; the main site keeps the cards in it. */
+.jp-photo{ aspect-ratio:4/3; }
+@media(min-width:1000px){ .jp-photo{ aspect-ratio:auto; height:100%; min-height:320px; } }
+
+/* Balanced wrapping where a short last line read as a mistake: the hero
+   line ("in / one place"), the JP heading (zh "內。" alone), the coach
+   ratio line ("16" alone). The opens-soon note is two spans that each keep
+   to one line where they fit, so the break falls between the sentences. */
+.hero-a .hero-text-block .lead,
+.jp-text .h-section,
+.coach-card .coach-size{ text-wrap:balance; }
+.soon-note > span{ display:inline-block; }
+
+/* Coach cards: a title that wraps ("Volleyball / coach") pushed that card's
+   chips, ratio and price 27px below its neighbours. Two title lines are
+   reserved wherever the cards sit side by side. */
+@media(min-width:1000px){ .coach-card .h-coach{ min-height:2.5em; line-height:1.25; } }
+.coach-avatar{ display:flex; align-items:center; justify-content:center; color:var(--court-line-blue); }
+.coach-avatar svg{ width:30px; height:30px; }
+
+/* Visual QA 2026-10-04, fifth pass: crops for the client's full render set.
+   Basketball and pickleball tiles come from the same camera and read as one
+   image twice side by side, so each takes its own close crop of the full
+   1600px file: the hoop, and the low net with the kiosk and ottomans. */
+.space-tile .crop-hoop{ object-position:100% 50%; transform:scale(1.5); transform-origin:80% 40%; }
+.space-tile .crop-net{ object-position:0% 50%; transform:scale(1.5); transform-origin:10% 62%; }
+/* Intro on phones: a 4:3 frame sliced the neon slogan and showed its garbled
+   mirror image in the glass; a square frame at the right edge drops both. */
+.intro-photo img.crop-entrance{ object-position:100% 50%; }
+@media(max-width:899px){ .intro-photo .photo-rect{ aspect-ratio:1/1; } }
+@media(min-width:900px){ .intro-photo img.crop-entrance{ object-position:85% 50%; } }
+/* Coming-soon JP photo: the frame matches the render's ratio, so only a
+   scale crops the garbled neon panel at its right edge. */
+.jp-photo img{ transform:scale(1.14); transform-origin:0 50%; }
+/* "HK$ TBC" inside a photo tile inherited Meta grey (2.1 to 3.1:1 on the
+   scrim); on photos and dark bands it takes Court line blue. */
+.on-photo .price-tbc,.on-dark .price-tbc{ color:var(--court-line-blue); }
+.tile-text .body-text{ text-wrap:balance; }
+/* Recovery has no render yet; a navy panel reads as deliberate where a pale
+   one read as a photo that failed to load. */
+.space-tile.is-panel{ background:var(--deep-navy); border-color:var(--deep-navy); }
+.space-tile.is-panel .tile-text .h-tile{ color:var(--court-cream); }
+/* Phones: the court drawings collided with two-line tile labels, and the
+   longest label wrapped to three lines over the pale wall above its scrim. */
+@media(max-width:479px){
+  .space-tile .court-dia{ display:none; }
+  .space-tile .tile-text .h-tile{ font-size:18px; }
+}
+/* Phones: a three-line tile label ("Strength and / conditioning / floor")
+   climbed above the 42% caption band onto the pale wall. Under 480px the
+   space tiles' band runs taller and darker, and labels break evenly. */
+@media(max-width:479px){
+  .space-tile .scrim.scrim-tile{ height:62%; background:linear-gradient(180deg, rgba(17,37,72,0) 0%, rgba(17,37,72,.45) 35%, rgba(17,37,72,.85) 100%); }
+}
+.space-tile .tile-text .h-tile{ text-wrap:balance; }

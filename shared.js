@@ -49,9 +49,56 @@ function setLang(l){
 /* wa.me link with a per-page prefill, so enquiries arrive labelled. Text is
    passed in already resolved (the caller reads it from STRINGS so no
    Chinese/English literal lives in this file). */
+function waHref(text){
+  return 'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(text || '');
+}
 function waLink(id, text){
   const a = document.getElementById(id); if (!a) return;
-  a.href = 'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(text);
+  a.href = waHref(text);
+}
+
+/* ---------- round 5: two pages, one source ----------
+   Alfred (2026-10-04): the main site keeps the normal booking flow, and
+   Suki's "coming soon, for enquiries" version is a separate page.
+   index.html (data-booking="open") is the main site. coming-soon.html is
+   generated from it by scripts/build_coming_soon.py with
+   data-booking="soon", so the two never drift apart.
+   Every booking link carries data-book="venue|class|pt" (plus data-sport
+   for a court). On the main site wireBooking() points it at booking.html
+   with its mode and court, exactly as the markup does. On the coming-soon
+   page it opens WhatsApp with a prefilled message (data-wa names the
+   prefill key where a general one fits better), or goes to the on-page
+   anchor in data-book-soon (tiles and footer links, which read as
+   navigation); labels with data-str-soon swap to that key ("WhatsApp us"),
+   .soon-only notes show and .open-only copy hides (site.css). */
+function bookingMode(){
+  return document.documentElement.getAttribute('data-booking') === 'soon' ? 'soon' : 'open';
+}
+
+function wireBooking(){
+  const d = (window.STRINGS && (window.STRINGS[lang()] || window.STRINGS.en)) || {};
+  const soon = bookingMode() === 'soon';
+  document.querySelectorAll('[data-book]').forEach(a=>{
+    const mode = a.getAttribute('data-book');
+    const sport = a.getAttribute('data-sport');
+    const anchor = a.getAttribute('data-book-soon');
+    if (!soon){
+      a.href = 'booking.html?mode=' + mode + (sport ? '&court=' + sport : '');
+      a.removeAttribute('target'); a.removeAttribute('rel');
+      return;
+    }
+    const label = a.getAttribute('data-str-soon');
+    if (label && d[label] !== undefined) a.textContent = d[label];
+    if (anchor){ a.href = anchor; a.removeAttribute('target'); a.removeAttribute('rel'); return; }
+    let text = d['wa.prefillBook'];
+    if (mode === 'venue' && sport) text = (d['wa.prefillCourt'] || '').replace('{sport}', d['sport.' + sport + '.name'] || sport);
+    if (mode === 'class') text = d['wa.prefillClass'];
+    if (mode === 'pt') text = d['wa.prefillPt'];
+    const forced = a.getAttribute('data-wa');
+    if (forced && d[forced]) text = d[forced];
+    a.href = waHref(text);
+    a.target = '_blank'; a.rel = 'noopener';
+  });
 }
 
 /* ---------- nav: language toggle clicks + mobile drawer ---------- */

@@ -28,6 +28,9 @@
   /* photo scrim gradients */
   --scrim-bottom: linear-gradient(180deg, rgba(17,37,72,0) 35%, rgba(17,37,72,.66) 100%);
   --scrim-top: linear-gradient(180deg, rgba(17,37,72,.45), rgba(17,37,72,0) 30%);
+  /* round 5 (2026-09-25 call): the transparent nav's cream labels need at
+     least .62 behind the whole 72px nav row, then the wash fades out */
+  --scrim-nav: linear-gradient(180deg, rgba(17,37,72,.72) 0, rgba(17,37,72,.62) 72px, rgba(17,37,72,0) 100%);
 
   /* ---------- radius tokens: use these seven and nothing else (plus 50% for circles) ---------- */
   --r-pill: 999px;

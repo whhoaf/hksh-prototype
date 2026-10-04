@@ -448,3 +448,33 @@ html[data-view="client"] .cr{ display:none !important; }
 .recap .watermark{ position:absolute; right:-24px; bottom:-20px; width:150px; height:133px; color:var(--court-line-blue); opacity:.16; pointer-events:none; }
 .recap .watermark svg{ width:150px; height:133px; }
 .recap .li{ position:relative; z-index:1; }
+
+/* ============ round 5 (2026-10-04): court prices in the booking flow ============ */
+/* Court A / Court B for volleyball and floorball: joined to the selected card
+   and the hours stepper as one panel, like .qty (which keeps its own -10px
+   pull-up to close the grid gap, so both pull up the same way). */
+.csize{
+  margin-top:-10px; background:rgba(30,68,137,.05);
+  border:1.5px solid var(--sideline-navy); border-top:0; border-bottom:0;
+  padding:10px 15px 6px; display:flex; flex-wrap:wrap; align-items:center; gap:8px 10px;
+}
+.csize-l{ font-family:var(--f-display); font-weight:600; font-size:14px; color:var(--deep-navy); flex:0 0 100%; }
+@media(min-width:620px){ .csize-l{ flex:none; margin-right:4px; } }
+.csize-b{
+  min-height:44px; padding:6px 16px; border-radius:var(--r-pill); cursor:pointer;
+  border:1px solid var(--hairline); background:var(--raised-cream); color:var(--deep-navy);
+  display:inline-flex; flex-direction:column; align-items:flex-start; justify-content:center; text-align:left;
+  transition:border-color var(--dur) var(--ease);
+}
+.csize-b:hover{ border-color:var(--sideline-navy); }
+.csize-b[aria-pressed="true"]{ background:var(--sideline-navy); border-color:var(--sideline-navy); color:var(--court-cream); }
+.csize-b .cs-t{ font-family:var(--f-display); font-weight:600; font-size:14.5px; line-height:1.2; }
+.csize-b .cs-p{ font-size:12.5px; font-weight:500; opacity:.8; line-height:1.3; }
+.csize + .qty{ border-top:1px dashed rgba(30,68,137,.25); }
+
+/* Each slot carries its own price on a court booking: peak and off-peak
+   differ, so the price sits on the hour rather than in a rule to decode. */
+.tslot{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; padding:6px 4px; }
+.tslot .tp{ font-size:12px; font-weight:500; color:var(--meta-grey); line-height:1.2; }
+.tslot.on .tp{ color:rgba(251,243,228,.85); }
+.tslot:disabled .tp{ color:inherit; }
