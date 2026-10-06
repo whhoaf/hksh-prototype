@@ -15,7 +15,11 @@
    index.html's closing <script> block).
    Front end only. No network calls beyond localStorage. */
 
-const WA_NUMBER = "852XXXXXXXX";   /* TBC: replace with the real number, then search for WA_NUMBER */
+const WA_NUMBER = "85255849706";   /* general enquiries, +852 5584 9706 (Suki, contact card 2026-10-04) */
+/* Corporate enquiries get their own number (Suki: "i will share later").
+   Until it arrives they go to the general number, still labelled by the
+   corporate prefill. Replace this one line when it comes. */
+const WA_NUMBER_CORP = WA_NUMBER;
 
 /* ---------- language ---------- */
 /* Same localStorage key as v1 ('shhk-lang'), so index.html and booking.html
@@ -49,12 +53,12 @@ function setLang(l){
 /* wa.me link with a per-page prefill, so enquiries arrive labelled. Text is
    passed in already resolved (the caller reads it from STRINGS so no
    Chinese/English literal lives in this file). */
-function waHref(text){
-  return 'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(text || '');
+function waHref(text, number){
+  return 'https://wa.me/' + (number || WA_NUMBER) + '?text=' + encodeURIComponent(text || '');
 }
-function waLink(id, text){
+function waLink(id, text, number){
   const a = document.getElementById(id); if (!a) return;
-  a.href = waHref(text);
+  a.href = waHref(text, number);
 }
 
 /* ---------- round 5: two pages, one source ----------

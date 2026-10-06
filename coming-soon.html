@@ -5,8 +5,17 @@
      edit index.html and rerun the script. -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Sporting Hub Hong Kong, opening November 2026</title>
-<meta name="description" content="Sporting Hub Hong Kong opens in November 2026: an indoor venue with courts by the hour for volleyball, basketball, pickleball, floorball, Teqvoly, dodgeball and badminton, classes and Just Performance coaching. Prices and enquiries on WhatsApp.">
+<title>Sporting Hub Hong Kong, opening December 2026</title>
+<meta name="description" content="Sporting Hub Hong Kong opens in December 2026 at Hong Kong Garden, Tsing Lung Tau. Courts by the hour for volleyball, basketball, pickleball, floorball, Teqvoly, dodgeball and badminton, classes and Just Performance coaching. Prices and enquiries on WhatsApp.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Sporting Hub Hong Kong">
+<meta property="og:title" content="Sporting Hub Hong Kong">
+<meta property="og:description" content="An indoor sports venue at Hong Kong Garden, Tsing Lung Tau. Courts by the hour, classes and Just Performance coaching. Opening December 2026.">
+<meta property="og:image" content="https://whhoaf.github.io/hksh-prototype/assets/og/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://whhoaf.github.io/hksh-prototype/coming-soon.html">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&amp;family=Figtree:wght@400;500;600&amp;family=Barlow+Condensed:wght@600;700&amp;family=EB+Garamond:wght@400;500&amp;family=Noto+Sans+TC:wght@400;500;700;900&amp;family=Noto+Serif+TC:wght@400&amp;display=swap" rel="stylesheet">
@@ -62,7 +71,7 @@
 </svg></a>
     <nav class="nav-items">
       <a href="#pillars" data-str="nav.service"></a>
-      <span class="nav-item-wrap"><a href="#" data-str="nav.shop"><svg class="out" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a><span class="tbc" data-str="nav.shopTbc"></span></span>
+      <span class="nav-item-wrap"><a href="#shop" data-shop-link data-str="nav.shop"><svg class="out" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a><span class="tbc" data-str="nav.shopTbc"></span></span>
       <a href="#jp" data-str="nav.team"></a>
       <a href="#corporate" data-str="nav.corporate"></a>
       <a href="#find" data-str="nav.contact"></a>
@@ -81,7 +90,7 @@
 <nav class="drawer" id="drawer" data-str-aria="nav.menu_aria">
   <button type="button" class="drawer-x" id="drawerX" data-str-aria="nav.closeAria">&times;</button>
   <a href="#pillars" data-str="nav.service"></a>
-  <span class="drawer-item-wrap"><a href="#" data-str="nav.shop"></a><span class="tbc" data-str="nav.shopTbc"></span></span>
+  <span class="drawer-item-wrap"><a href="#shop" data-shop-link data-str="nav.shop"></a><span class="tbc" data-str="nav.shopTbc"></span></span>
   <a href="#jp" data-str="nav.team"></a>
   <a href="#corporate" data-str="nav.corporate"></a>
   <a href="#find" data-str="nav.contact"></a>
@@ -90,10 +99,10 @@
 
 <section class="hero hero-a" id="hero-a">
   <div class="hero-slideshow" aria-roledescription="carousel" aria-label="Venue photos">
-    <div class="hero-slide is-active"><img src="assets/venue/hall-volleyball.jpg" alt="" loading="eager" style="object-position:30% 0"></div>
-      <div class="hero-slide"><img src="assets/venue/hall-corridor.jpg" alt="" loading="lazy" style="object-position:38% 0"></div>
-      <div class="hero-slide"><img src="assets/venue/hall-basketball.jpg" alt="" loading="lazy" style="object-position:30% 0"></div>
-      <div class="hero-slide"><img src="assets/venue/hall-low-net.jpg" alt="" loading="lazy" style="object-position:65% 0"></div>
+    <div class="hero-slide is-active"><img src="assets/venue/hall-volleyball.jpg" alt="" loading="eager" style="--hx:30%;--hy:100%;--hx-m:22%;--hz-m:130%"></div>
+      <div class="hero-slide"><img src="assets/venue/hall-corridor.jpg" alt="" loading="lazy" style="--hx:38%;--hy:100%;--hz-m:120%"></div>
+      <div class="hero-slide"><img src="assets/venue/hall-basketball.jpg" alt="" loading="lazy" style="--hx:70%;--hy:100%;--hx-m:85%;--hz-m:130%"></div>
+      <div class="hero-slide"><img src="assets/venue/hall-low-net.jpg" alt="" loading="lazy" style="--hx:65%;--hy:100%;--hx-m:78%;--hz-m:120%"></div>
     <button type="button" class="hero-arrow prev" aria-label="Previous photo"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <button type="button" class="hero-arrow next" aria-label="Next photo"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <div class="hero-dots">
@@ -149,9 +158,9 @@
         <p class="lead on-photo" style="margin-bottom:22px" data-str="hero.lead"></p>
         <div class="hero-actions">
           <a class="btn btn-primary btn-on-dark" href="booking.html" data-book="venue" data-wa="wa.prefillGeneral" data-str="cta.book" data-str-soon="find.waBtn"></a>
-          <a class="btn btn-secondary btn-on-dark" href="#pillars" data-str="cta.classes"></a>
+          <a class="btn btn-secondary btn-on-dark open-only" href="#pillars" data-str="cta.classes"></a>
         </div>
-        <p class="soon-note on-photo soon-only"><span data-str="soon.note1"></span> <span data-str="soon.note2"></span></p>
+        <p class="soon-note on-photo soon-only"><span data-str="soon.note1"></span><span data-str="soon.note2"></span></p>
       </div>
     </div>
   </div>
@@ -239,7 +248,7 @@
           <a class="btn btn-secondary" id="pricePdf" href="#" target="_blank" rel="noopener" hidden data-str="prices.pdf"></a>
           <span class="tbc" id="pricePdfTbc" data-str="prices.pdfTbc"></span>
         </div>
-        <p class="soon-note soon-only"><span data-str="soon.note1"></span> <span data-str="soon.note2"></span></p>
+        <p class="soon-note soon-only"><span data-str="soon.note1"></span><span data-str="soon.note2"></span></p>
       </div>
     </div>
   </div>
@@ -597,7 +606,7 @@
           </div>
         </div>
       </div>
-      <a class="shop-tile photo-frame" href="#" id="shop" target="_blank" rel="noopener">
+      <a class="shop-tile photo-frame" id="shop">
         <span class="photo-slot">shop-tile &middot; shop kiosk render, lower scrim</span>
         <img src="assets/venue/shop-kiosk-800.jpg" alt="" loading="lazy" style="object-position:100% 50%">
         <span class="scrim scrim-tile" aria-hidden="true"></span>
@@ -605,7 +614,8 @@
           <span class="eyebrow on-photo" style="margin-bottom:6px" data-str="shop.eyebrow"></span>
           <span class="h-tile on-photo" style="display:block;margin-bottom:8px" data-str="shop.title"></span>
           <span style="display:flex;align-items:center;flex-wrap:wrap;gap:10px">
-            <span class="text-link on-photo"><span data-str="shop.link"></span><svg class="out" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="text-link on-photo shop-go"><span data-str="shop.link"></span><svg class="out" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <span class="shop-soon on-photo" data-str="shop.soon"></span>
             <span class="tbc" data-str="shop.tbcName"></span>
           </span>
         </span>
@@ -614,7 +624,7 @@
   </div>
 </section>
 
-<section class="section">
+<section class="section open-only">
   <div class="wrap">
     <div class="book-band">
       <span class="watermark"><svg data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 106.15 94.01">
@@ -700,20 +710,21 @@
       </div>
       <div>
         <dl>
-          <div class="facts-row"><dt data-str="find.addressLabel"></dt><dd><span class="tbc" data-str="find.addressValue"></span></dd></div>
-          <div class="facts-row"><dt data-str="find.hoursLabel"></dt><dd><span class="tbc" data-str="find.hoursValue"></span></dd></div>
-          <div class="facts-row"><dt data-str="find.mtrLabel"></dt><dd><span class="tbc" data-str="find.mtrValue"></span></dd></div>
-          <div class="facts-row"><dt data-str="find.waLabel"></dt><dd><span class="tbc" data-str="find.waValue"></span></dd></div>
-          <div class="facts-row"><dt data-str="find.emailLabel"></dt><dd><span class="tbc" data-str="find.emailValue"></span></dd></div>
+          <div class="facts-row"><dt data-str="find.addressLabel"></dt><dd data-str="find.addressValue"></dd></div>
+          <div class="facts-row is-tbc"><dt data-str="find.hoursLabel"></dt><dd><span class="tbc" data-str="find.hoursValue"></span></dd></div>
+          <div class="facts-row"><dt data-str="find.transportLabel"></dt><dd data-str="find.transportValue"></dd></div>
+          <div class="facts-row"><dt data-str="find.parkingLabel"></dt><dd data-str="find.parkingValue"></dd></div>
+          <div class="facts-row"><dt data-str="find.waLabel"></dt><dd><a href="#" id="waFact" target="_blank" rel="noopener" data-str="find.waValue"></a></dd></div>
+          <div class="facts-row"><dt data-str="find.emailLabel"></dt><dd><a href="mailto:info@asportinghub.com" data-str="find.emailValue"></a></dd></div>
         </dl>
         <div class="find-actions">
           <a class="btn btn-secondary" href="#" id="waFind" target="_blank" rel="noopener"><svg class="wa-glyph" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm0 18.15h-.01a8.2 8.2 0 01-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 01-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24a8.2 8.2 0 015.83 2.42 8.19 8.19 0 012.41 5.83c0 4.54-3.7 8.23-8.24 8.23zm4.52-6.16c-.25-.13-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.79.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.13-.56-1.35-.77-1.84-.2-.49-.4-.42-.56-.43h-.47c-.17 0-.43.06-.66.31-.22.25-.87.85-.87 2.07s.89 2.4 1.02 2.56c.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.11-.22-.17-.47-.29z" fill="#25D366"/></svg><span data-str="find.waBtn"></span></a>
-          <a class="btn btn-secondary is-disabled" href="#" aria-disabled="true"><span data-str="find.directionsBtn"></span><span class="tbc" style="margin-left:6px" data-str="find.addressValue"></span></a>
+          <a class="btn btn-secondary" href="https://maps.app.goo.gl/s2hB7EJsx2cGzE119" target="_blank" rel="noopener"><span data-str="find.directionsBtn"></span></a>
         </div>
       </div>
     </div>
     <div class="map-tile">
-      <span class="meta" data-str="find.mapCaption"></span>
+      <iframe id="mapFrame" title="" data-str-title="find.mapTitle" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
     </div>
   </div>
 </section>
@@ -790,7 +801,7 @@
         <ul>
           <li><a href="#shop" data-str="footer.linkShop"></a></li>
           <li><a href="#find" data-str="footer.linkContact"></a></li>
-          <li><a href="#" data-str="footer.linkPrivacy"></a></li>
+          <li hidden><a href="#" data-str="footer.linkPrivacy"></a></li><!-- round 6: hidden until a privacy page exists -->
         </ul>
       </div>
     </div>
@@ -801,7 +812,7 @@
   </div>
 </footer>
 
-<a class="wa-float" href="#" id="waFloat" target="_blank" rel="noopener" data-str-aria="wa.ariaLabel" title="" data-str-title="wa.tbcNumber"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm0 18.15h-.01a8.2 8.2 0 01-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 01-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24a8.2 8.2 0 015.83 2.42 8.19 8.19 0 012.41 5.83c0 4.54-3.7 8.23-8.24 8.23zm4.52-6.16c-.25-.13-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.79.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.13-.56-1.35-.77-1.84-.2-.49-.4-.42-.56-.43h-.47c-.17 0-.43.06-.66.31-.22.25-.87.85-.87 2.07s.89 2.4 1.02 2.56c.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.11-.22-.17-.47-.29z"/></svg></a>
+<a class="wa-float" href="#" id="waFloat" target="_blank" rel="noopener" data-str-aria="wa.ariaLabel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 004.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0012.04 2zm0 18.15h-.01a8.2 8.2 0 01-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 01-1.26-4.38c0-4.54 3.7-8.24 8.25-8.24a8.2 8.2 0 015.83 2.42 8.19 8.19 0 012.41 5.83c0 4.54-3.7 8.23-8.24 8.23zm4.52-6.16c-.25-.13-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.79.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.13-.56-1.35-.77-1.84-.2-.49-.4-.42-.56-.43h-.47c-.17 0-.43.06-.66.31-.22.25-.87.85-.87 2.07s.89 2.4 1.02 2.56c.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.11-.22-.17-.47-.29z"/></svg></a>
 
 <div class="tweaks-panel">
   <div class="tweaks-title" data-str="tweaks.title"></div>
@@ -830,7 +841,9 @@ function renderPrices(){
   const tpl = STRINGS[lang()]['price.fromTemplate'];
   document.querySelectorAll('[data-price-cat]').forEach(el=>{
     const cat = el.getAttribute('data-price-cat');
-    el.innerHTML = tpl.replace('{p}', money(FROM_PRICES[cat]));
+    el.innerHTML = FROM_PRICES[cat] == null
+      ? STRINGS[lang()]['price.soon']          /* round 6: class and PT prices not out yet */
+      : tpl.replace('{p}', money(FROM_PRICES[cat]));
     /* the wrapper's own price-tbc styling only while the figure is a placeholder */
     el.classList.toggle('price-tbc', FROM_PRICES[cat] == null);
   });
@@ -851,17 +864,50 @@ function renderRateTable(){
   if (fee) fee.innerHTML = money(MEMBERSHIP_FEE);
 }
 
-/* The price list PDF stays Suki's own file so she can update it herself
-   (DESIGN.md, Price table). Until she sends one, the button stays hidden
-   and dev view shows a to-confirm tag in its place. Set the URL here. */
-const PRICE_PDF_URL = null;
+/* Round 6 (N46): Suki's rate card images, one per language, so she can
+   replace them herself. Held back until she confirms the court sizes: the
+   card prints 9m x 9m and 8m x 8m, her message says 9m x 18m and 8m x 16m.
+   Flip RATE_CARD_READY once a corrected card is in assets/price/. */
+const RATE_CARD = { en: 'assets/price/rate-card-en.jpg', zh: 'assets/price/rate-card-zh.jpg' };
+const RATE_CARD_READY = false;
 function wirePricePdf(){
   const a = document.getElementById('pricePdf');
   const tag = document.getElementById('pricePdfTbc');
   if (!a) return;
-  a.hidden = !PRICE_PDF_URL;
-  if (PRICE_PDF_URL) a.href = PRICE_PDF_URL;
-  if (tag) tag.hidden = !!PRICE_PDF_URL;
+  const l = lang() === 'zh' ? 'zh' : 'en';
+  a.hidden = !RATE_CARD_READY;
+  a.href = RATE_CARD[l];
+  a.setAttribute('download', 'sporting-hub-hk-rate-card-' + l + '.jpg');
+  if (tag) tag.hidden = RATE_CARD_READY;
+}
+
+/* Round 6: the online store is not live yet (Suki: "coming soon"). With no
+   URL the shop tile says so and the Shop links scroll to it; set SHOP_URL
+   when the store is renamed and everything turns into an outbound link. */
+const SHOP_URL = null;
+function wireShop(){
+  const out = !!SHOP_URL;
+  const tile = document.getElementById('shop');
+  if (tile){
+    if (out){ tile.href = SHOP_URL; tile.target = '_blank'; tile.rel = 'noopener'; }
+    else { tile.removeAttribute('href'); tile.removeAttribute('target'); tile.removeAttribute('rel'); }
+    tile.classList.toggle('is-soon', !out);
+  }
+  document.querySelectorAll('[data-shop-link]').forEach(a => {
+    if (out){ a.href = SHOP_URL; a.target = '_blank'; a.rel = 'noopener'; }
+    else { a.href = '#shop'; a.removeAttribute('target'); a.removeAttribute('rel'); }
+    a.classList.toggle('is-soon', !out);
+  });
+}
+
+/* Round 6 (N49): Google map of the venue, no API key (the embed URL Google
+   itself redirects maps?output=embed to). Map labels follow the page language. */
+const MAP_PB = '!1m3!2m1!1z6LGq5pmv6Iqx5ZyS5ZWG5aC0IOmdkum-jemgremdkuWxseWFrOi3rzEwMOiZnw!6i16';
+function wireMap(){
+  const f = document.getElementById('mapFrame'); if (!f) return;
+  const hl = lang() === 'zh' ? 'zh-HK' : 'en';
+  const src = 'https://www.google.com/maps/embed?origin=mfe&pb=' + MAP_PB + '!3m1!1s' + hl + '!5m1!1s' + hl;
+  if (f.getAttribute('src') !== src) f.setAttribute('src', src);
 }
 
 /* ---------- dev/client tweaks panel ---------- */
@@ -964,12 +1010,15 @@ function pageExtras(){
   renderPrices();
   renderRateTable();
   wirePricePdf();
+  wireShop();
+  wireMap();
   wireBooking();
   const wa = STRINGS[lang()]['wa.prefillGeneral'];
   const waCorp = STRINGS[lang()]['wa.prefillCorporate'];
   waLink('waFloat', wa);
   waLink('waFind', wa);
-  waLink('waCorp', waCorp);
+  waLink('waFact', wa);
+  waLink('waCorp', waCorp, WA_NUMBER_CORP);
 }
 
 document.addEventListener('DOMContentLoaded', () => {

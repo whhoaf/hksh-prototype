@@ -454,7 +454,26 @@ body{ padding-top:64px; }
    visible crop on all five slides. No inline object-position on the <img>
    tags (see index.html): this single rule governs every hero slide
    uniformly. */
-.hero-slide img{ width:100%; height:145%; object-fit:cover; object-position:50% 0; display:block; }
+/* Round 6 (N42, 2026-10-06): the rule above was written for the old
+   render-1..5. On the client's 2026-10-04 render set it kept only the top
+   69% of each frame, so phones saw ceiling and ducts and almost no court
+   (Suki: "淨係見到天花"). Each slide now sets its own crop in inline
+   custom properties: --hz is the image box height (zoom), --hx / --hy the
+   object-position, with -m variants for phones. The box is pinned to the
+   slide's bottom edge, so any zoom cuts ceiling, never court. */
+.hero-slide img{ position:absolute; left:0; bottom:0; width:100%; object-fit:cover; display:block;
+  height:var(--hz-m, var(--hz, 100%)); object-position:var(--hx-m, var(--hx, 50%)) var(--hy-m, var(--hy, 50%)); }
+@media(min-width:760px){
+  .hero-slide img{ height:var(--hz, 100%); object-position:var(--hx, 50%) var(--hy, 50%); }
+}
+/* tablets in portrait would otherwise show the full frame, a third of it ceiling */
+@media(min-width:760px) and (max-width:999px){
+  .hero-slide img{ height:var(--hz-t, 120%); }
+}
+/* phones: dots centred, clear of the floating WhatsApp button (Suki's screenshot: it hid dot 3) */
+@media(max-width:759px){
+  .hero-dots{ right:auto; left:50%; transform:translateX(-50%); }
+}
 
 .hero-dots{ position:absolute; z-index:4; right:16px; bottom:16px; display:flex; gap:2px; }
 @media(min-width:760px){ .hero-dots{ right:24px; bottom:24px; } }
@@ -723,6 +742,28 @@ body{ padding-top:64px; }
   height:280px; display:flex; align-items:center; justify-content:center; text-align:center; padding:20px;
 }
 .map-tile .meta{ max-width:36ch; }
+/* Round 6: the map itself fills the tile */
+.map-tile:has(iframe){ padding:0; overflow:hidden; height:320px; }
+.map-tile iframe{ width:100%; height:100%; border:0; display:block; }
+/* rows still waiting on the client stay visible, tagged, in dev view only */
+html[data-view="client"] .facts-row.is-tbc{ display:none; }
+/* Round 6: shop tile while the store is not live */
+.shop-tile.is-soon .shop-go, a.is-soon > .out{ display:none; }
+.shop-tile:not(.is-soon) .shop-soon{ display:none; }
+.shop-soon{ font-family:var(--f-display); font-weight:600; font-size:15px; }
+.shop-soon.on-photo{ color:var(--court-cream); }
+/* find us: labels sit on the first line of their value, links read as links */
+.facts-row{ align-items:baseline; }
+.facts-row dd a{ color:var(--sideline-navy); text-decoration:underline; text-underline-offset:3px; }
+#find .h-section{ text-wrap:balance; }
+/* Chinese: break at spaces and punctuation so 豪景花園, 九巴, 分鐘, 非繁忙時段 stay whole;
+   anywhere only if a run would overflow */
+html[lang="zh-Hant"] .facts-row dd, html[lang="zh-Hant"] #find .h-section,
+html[lang="zh-Hant"] .price-hours{ word-break:keep-all; overflow-wrap:anywhere; }
+/* the two note sentences: a space's width in English, none in Chinese */
+.soon-note > span + span{ margin-left:.28em; }
+html[lang="zh-Hant"] .soon-note > span + span{ margin-left:0; }
+#prices, #spaces, #jp, #corporate, #find, #shop{ scroll-margin-top:90px; }
 
 /* ============ footer (section 9) ============ */
 .site-footer{ background:var(--deep-navy); color:var(--court-cream); padding:56px 0 28px; }

@@ -262,6 +262,11 @@ html[lang="zh-Hant"] .tag{ font-family:"Noto Sans TC",sans-serif; letter-spacing
 }
 .tslot:hover:not(:disabled){ border-color:var(--sideline-navy); }
 .tslot.on{ background:var(--sideline-navy); border-color:var(--sideline-navy); color:var(--court-cream); }
+/* Round 6: the free hour either side of a single pick, tap it for two hours */
+.tslot.adj{ border:1.5px dashed var(--sideline-navy); }
+/* the notes under the grid: Charcoal (Meta grey is 4.3:1 on cream), clear of the WhatsApp button on phones */
+#s2note, #s2rates{ color:var(--charcoal); }
+@media(max-width:619px){ #s2note, #s2rates{ padding-right:64px; } }
 .tslot:disabled{
   background:var(--hairline); border-color:var(--hairline); color:var(--meta-grey); cursor:not-allowed; text-decoration:line-through;
 }
@@ -390,6 +395,10 @@ html[data-view="client"] .cr{ display:none !important; }
    shadow while the stepper is attached, so the pair casts one shadow at the
    bottom rather than a seam across the middle. */
 .opt.sel.has-qty{ border-bottom-left-radius:0; border-bottom-right-radius:0; box-shadow:none; }
+/* Round 6: the hours stepper is gone (.qty rules below are unused). A
+   two-court sport's card now joins only its Court A / B panel, which
+   closes the pair at the bottom. */
+.opt.sel.has-panel{ border-bottom-left-radius:0; border-bottom-right-radius:0; box-shadow:none; }
 .qty{
   margin-top:-10px; background:rgba(30,68,137,.05);
   border:1.5px solid var(--sideline-navy); border-top:0;
@@ -455,8 +464,9 @@ html[data-view="client"] .cr{ display:none !important; }
    pull-up to close the grid gap, so both pull up the same way). */
 .csize{
   margin-top:-10px; background:rgba(30,68,137,.05);
-  border:1.5px solid var(--sideline-navy); border-top:0; border-bottom:0;
-  padding:10px 15px 6px; display:flex; flex-wrap:wrap; align-items:center; gap:8px 10px;
+  border:1.5px solid var(--sideline-navy); border-top:0;
+  border-radius:0 0 var(--r-card) var(--r-card); box-shadow:var(--shadow-float);
+  padding:10px 15px 12px; display:flex; flex-wrap:wrap; align-items:center; gap:8px 10px;
 }
 .csize-l{ font-family:var(--f-display); font-weight:600; font-size:14px; color:var(--deep-navy); flex:0 0 100%; }
 @media(min-width:620px){ .csize-l{ flex:none; margin-right:4px; } }

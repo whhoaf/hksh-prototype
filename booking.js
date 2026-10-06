@@ -114,10 +114,10 @@ function fromRate(id){
    rate times the hours; null (HK$ TBC) for classes and personal training */
 function courtTotal(){
   if(MODE !== 'venue' || !S.court) return null;
-  if(S.times.length === S.hours && rateRow())
+  if(S.times.length && rateRow())
     return { exact:true, v:S.times.reduce((a, t) => a + slotPrice(S.day, t), 0) };
   const f = fromRate(S.court);
-  return f == null ? null : { exact:false, v:f * S.hours };
+  return f == null ? null : { exact:false, v:f };
 }
 const G = k => ((window.STRINGS || {})[L()] || {})[k] || '';   /* landing-page string keys */
 
@@ -165,14 +165,9 @@ const AVATAR = `<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3
 const coachVal  = role => `${role}, ${T('coach_tbc')}`;
 const coachLine = role => `${T('l_coach')}: ${coachVal(role)}`;
 
-/* ---------- round 3/4: the stepper counts HOURS, not courts ----------
-   Round 2 read the client's sketched plus and minus boxes as a court
-   quantity capped at 2. Round 3 corrected it: the control is hours, and the
-   cap is per HKID, not per hall. Drawn, not typed, so no dash character of
-   any kind enters the copy. */
-const MINUS = `<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7.2" width="10" height="1.6" rx="0.8" fill="currentColor"/></svg>`;
-const PLUS  = `<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7.2" width="10" height="1.6" rx="0.8" fill="currentColor"/><rect x="7.2" y="3" width="1.6" height="10" rx="0.8" fill="currentColor"/></svg>`;
-const MAX_HOURS = 2;   /* max 2 hours per HKID's booking (client, 2026-09-19) */
+/* ---------- hours: round 3 to 5 used a stepper; round 6 lets the time grid
+   set the length (one hour, or two back to back), see pickSlot() ---------- */
+const MAX_HOURS = 2;   /* max 2 hours a day per HKID, back to back (client 2026-09-19; Siu 2026-10-04) */
 
 /* Round 4: three of the seven bookable sports had no court diagram, so they
    got a neutral outline rather than an invented approximation. Round 5
@@ -187,7 +182,7 @@ const diaFor = c => (c && c.dia && DIA[c.dia]) ? DIA[c.dia] : DIA_TBC;
 const VENUE = 'Sporting Hub Hong Kong';   /* brand name, identical in both locales per strings.en.json's glossary */
 const REF = 'SHHK-2026-0001';             /* was inline in renderRecap */
 
-const TIMES = ["07:00","08:00","09:00","10:00","11:00","12:00","14:00","15:00",
+const TIMES = ["07:00","08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00",
                "16:00","17:00","18:00","19:00","20:00","21:00","22:00"];
 /* class session start times, one per card position. Lifted out of
    renderClasses (round 2 item 11) so the calendar link can read back the time
@@ -215,7 +210,7 @@ const RAIL = {
    filter on the session list) and dow (round 4 N2, the weekday picker for
    term courses) are the additions to v1's state object. */
 const S = { i:0, court:null, cat:null, cls:null, coach:null, size:null, day:0,
-            times:[], filters:[], hours:1, ctag:'', sport:'', dow:null, csize:null };
+            times:[], filters:[], ctag:'', sport:'', dow:null, csize:null };
 
 if (qs.get("court") && COURTS.some(c=>c.id===qs.get("court"))) S.court = qs.get("court");
 /* round 3: ?t= preselects a slot. TIMES is defined above, so an unknown value
@@ -252,23 +247,6 @@ function renderRail(){
   }).join('');
 }
 
-/* Round 3: the hours stepper for the selected court. It renders as the next
-   item in the .opts grid rather than inside the card, because .opt is a
-   <button> and a button may not legally contain the two stepper buttons;
-   booking.css merges the two into one card (.opt.sel.has-qty + .qty).
-   Range 1 to MAX_HOURS, default 1, reset whenever the court changes.
-   Changing the hours trims any slots already picked beyond the new count. */
-function qtyHTML(){
-  return `
-    <div class="qty">
-      <span class="qty-l">${T('qty_l')}</span>
-      <span class="qty-ctl">
-        <button type="button" class="qty-b" data-q="-1" aria-label="${T('qty_less')}" ${S.hours<=1?'disabled':''}>${MINUS}</button>
-        <span class="qty-v" aria-live="polite">${S.hours}</span>
-        <button type="button" class="qty-b" data-q="1" aria-label="${T('qty_more')}" ${S.hours>=MAX_HOURS?'disabled':''}>${PLUS}</button>
-      </span>
-    </div>`;
-}
 /* Round 5: the price line on a court card. A single-court sport, or a
    two-court sport once its court is picked, shows its off-peak to peak
    range; a two-court sport before the pick shows "from" its lowest rate. */
@@ -295,24 +273,18 @@ function renderCourts(){
   document.getElementById('courtList').innerHTML = COURTS.map(c=>{
     const sel = S.court===c.id;
     return `
-    <button class="opt ${sel?'sel has-qty':''}" data-court="${c.id}">
+    <button class="opt ${sel?'sel':''} ${sel&&twoCourts(c.id)?'has-panel':''}" data-court="${c.id}">
       <span class="dia">${diaFor(c)}</span>
       <span class="txt"><span class="t">${nm(c)}</span>
-        <span class="d">${courtPriceLine(c)}${sel&&S.hours>1?' × '+S.hours:''}</span></span>
-    </button>${sel&&twoCourts(c.id)?csizeHTML(c):''}${sel?qtyHTML():''}`;}).join('');
+        <span class="d">${courtPriceLine(c)}</span></span>
+    </button>${sel&&twoCourts(c.id)?csizeHTML(c):''}`;}).join('');
   /* Switching from one court to a DIFFERENT one resets the hours and clears
      any slots, since those were picked against the old court's availability.
      Choosing a court for the first time (S.court still null) must not, or a
      ?t= deep link would be wiped by the very first click. */
-  bind('courtList','court',v=>{ if(S.court && S.court!==v){ S.hours=1; S.times=[]; S.csize=null; } S.court=v; });
+  bind('courtList','court',v=>{ if(S.court && S.court!==v){ S.times=[]; S.csize=null; } S.court=v; });
   document.querySelectorAll('#courtList .csize-b').forEach(b=>b.onclick=()=>{
     S.csize = b.dataset.csize; renderCourts(); sync();
-  });
-  /* stepper clicks redraw this screen only, so the card keeps its place */
-  document.querySelectorAll('#courtList .qty-b').forEach(b=>b.onclick=()=>{
-    S.hours = Math.min(MAX_HOURS, Math.max(1, S.hours + Number(b.dataset.q)));
-    if(S.times.length > S.hours) S.times = S.times.slice(0, S.hours);
-    renderCourts(); sync();
   });
 }
 function renderCats(){
@@ -466,11 +438,23 @@ function renderClasses(){
     </button>`).join('') : `<p class="meta">${L()==='zh'?'此篩選沒有課堂。':'No classes match this filter.'}</p>`;
   bind('classList','cls',v=>{S.cls=v;});
 }
-/* Round 3: a booking of N hours picks N separate time slots. They do not have
-   to run back to back, so this is a multi-select capped at S.hours rather
-   than a range picker. Venue mode only: personal training still books one
-   slot, so needed() is 1 there. */
-function needed(){ return MODE==='venue' ? S.hours : 1; }
+/* Round 6 (N39, Siu 2026-10-04): up to two hours a day, back to back. The
+   time grid sets the length, so the round 3 hours stepper is gone: tap a
+   start time for one hour, then the hour just before or after it for two.
+   Tapping any other free slot starts again from there. No free slot is ever
+   disabled for being over the count: round 5 drew those in the booked style,
+   which is why 10:00 and 12:00 looked taken to Siu. Only booked slots are
+   struck through. Personal training still books one slot. */
+const hourOf = t => Number(t.slice(0, 2));
+function adjacentTo(t){
+  return MODE === 'venue' && S.times.length === 1 && Math.abs(hourOf(t) - hourOf(S.times[0])) === 1;
+}
+function pickSlot(t){
+  if(S.times.includes(t)){ S.times = S.times.filter(x => x !== t); return; }
+  if(adjacentTo(t) && S.times.length < MAX_HOURS){ S.times = S.times.concat(t).sort(); return; }
+  S.times = [t];
+}
+function needed(){ return 1; }
 function renderSlots(){
   const D = days();
   document.getElementById('dates2').innerHTML = D.map((d,i)=>
@@ -479,27 +463,26 @@ function renderSlots(){
     b.onclick=()=>{S.day=+b.dataset.d; S.times=[]; renderSlots(); sync();});
   const who = MODE==='pt'
     ? (COACHES.find(c=>c.id===S.coach)||{n:''}).n
-    : nm(COURTS.find(c=>c.id===S.court)||{en:'',zh:''});
+    : nm(COURTS.find(c=>c.id===S.court)||{en:'',zh:''})
+      + (MODE==='venue' && twoCourts(S.court) && S.csize ? ', ' + G('prices.court' + S.csize) : '');   /* round 6: A and B cost different amounts */
   document.getElementById('s2sub').textContent = who + ' · ' + D[S.day].full;
-  const need = needed(), got = S.times.length;
   document.getElementById('slots').innerHTML = TIMES.map((t,i)=>{
     const gone = taken(S.day,i);
     const on = S.times.includes(t);
-    /* once the quota is filled the remaining free slots are disabled, so the
-       count can never exceed the hours booked */
-    const full = !on && got >= need;
+    /* the free hour either side of a single pick: tap it for two hours */
+    const adj = !on && !gone && adjacentTo(t);
     /* round 5: on a court booking each slot shows what that hour costs */
     const p = MODE==='venue' ? slotPrice(S.day, t) : null;
     const price = p == null ? '' : `<span class="tp">${money(p)}</span>`;
-    return `<button class="tslot ${on?'on':''} ${p!=null&&isPeak(dayDate(S.day), t)?'peak':''}" data-t="${t}" ${gone||full?'disabled':''}>${t}${price}</button>`;
+    return `<button class="tslot ${on?'on':''} ${adj?'adj':''} ${p!=null&&isPeak(dayDate(S.day), t)?'peak':''}" data-t="${t}" ${gone?'disabled':''}>${t}${price}</button>`;
   }).join('');
   const rn = document.getElementById('s2rates');
   if(rn){ rn.hidden = MODE!=='venue'; rn.textContent = G('prices.hours'); }
+  const sn = document.getElementById('s2note');
+  if(sn) sn.hidden = MODE!=='venue';
   document.getElementById('slots').querySelectorAll('.tslot').forEach(b=>
     b.onclick=()=>{
-      const t = b.dataset.t;
-      if(S.times.includes(t)) S.times = S.times.filter(x=>x!==t);
-      else if(S.times.length < needed()) S.times = S.times.concat(t).sort();
+      pickSlot(b.dataset.t);
       renderSlots(); sync();
     });
 }
@@ -526,7 +509,7 @@ function lines(){
     out.push([T('l_court'), c ? nm(c) + (twoCourts(c.id) && S.csize ? ', ' + G('prices.court' + S.csize) : '') : null]);
     /* round 3: hours booked rides its own line, so it reaches the summary
        aside, the s7 block and the s8 recap in one place */
-    out.push([T('qty_l'), S.court ? String(S.hours) : null]);
+    out.push([T('qty_l'), S.times.length ? String(S.times.length) : null]);
     out.push([T('l_when'), whenText()]);
   }
   if(MODE==='class'){
@@ -619,8 +602,8 @@ function canAdvance(){
   if(id==='s5')  return !!S.coach;
   if(id==='s5b') return !!S.size;
   if(id==='s3')  return !!S.cls;
-  /* round 3: a booking of N hours needs N slots picked, not just one */
-  if(id==='s2')  return S.times.length === needed();
+  /* round 6: one slot, or two back to back (pickSlot keeps them adjacent) */
+  if(id==='s2')  return S.times.length >= needed();
   if(id==='s6')  return requiredFields().every(i=>{
                        const el = document.getElementById(i);
                        return !el || el.closest('[hidden]') ? true : el.value.trim();
@@ -759,6 +742,7 @@ function calEvent(){
   if(MODE==='venue'){
     const c = COURTS.find(x=>x.id===S.court);
     title = c ? nm(c) : '';
+    mins = 60 * Math.max(1, S.times.length);   /* round 6: two back-to-back hours */
   }
   if(MODE==='class'){
     const cl = CLASSES.find(x=>x.id===S.cls);
