@@ -86,9 +86,10 @@ h1,h2,h3,h4{ margin:0; font-family:var(--f-display); color:var(--deep-navy); }
    lockup centres in its column (margin-inline auto) instead of sitting
    flush left. The HERO copy of the SVG also tightens the gap between the
    script and "Hong Kong" (see g.lk-sub in index.html), which drops its
-   viewBox to 157.51 x 39.27 (ratio .2493) -- about 150px tall at the 600px
-   desktop ceiling. The NAV copy and assets/logo/*.svg keep the agency's
-   original 40.43 viewBox, untouched. */
+   viewBox to 157.32 x 39.23 (ratio .2494) -- about 150px tall at the 600px
+   desktop ceiling. The NAV copy and assets/logo/*.svg keep the delivered
+   40.38 viewBox, untouched. Lockup geometry from Suki's Logo.ai, 2026-10-09
+   (DESIGN.md v2.5). */
 .hero-lockup{
   display:block; color:var(--court-cream); width:min(420px, 86vw); line-height:0; margin:0 auto 16px;
 }
