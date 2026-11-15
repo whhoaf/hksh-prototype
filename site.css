@@ -731,7 +731,7 @@ body{ padding-top:64px; }
   background:var(--raised-cream); border:1px solid var(--hairline); border-radius:var(--r-card);
   padding:32px; display:flex; align-items:center; justify-content:center; height:100%;
 }
-.badge-card img{ width:340px; max-width:100%; height:auto; }
+.badge-card img{ width:100%; max-width:560px; height:auto; }
 .facts-row{ display:grid; grid-template-columns:118px 1fr; gap:12px; padding:14px 0; border-bottom:1px solid var(--hairline); }
 .facts-row:first-child{ border-top:1px solid var(--hairline); }
 .facts-row dt{ margin:0; font-family:var(--f-display); font-weight:600; font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--sideline-navy); }
