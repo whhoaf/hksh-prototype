@@ -878,6 +878,7 @@ html[data-booking="soon"] .tile-price.price-tbc{ display:none !important; }
 .price-actions{ display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-top:12px; }
 .price-notes > .soon-note{ margin-top:0; }
 .price-actions [hidden]{ display:none !important; }
+.price-note[hidden]{ display:none !important; }
 
 /* Visual QA 2026-10-03. The opens-soon line and the peak-hours note carry
    real information, so they take Charcoal rather than Meta grey, which sits
